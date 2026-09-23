@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitstack/CHANGE-ME/lib"
+package "moonbitstack/moonmedia/lib"
 
 // Values
 pub fn greet(StringView) -> String

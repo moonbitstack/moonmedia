@@ -1,59 +1,39 @@
-# CHANGE-ME
+# moonmedia
 
-One sentence saying what this is.
+Segmented streaming is three questions: what the bytes are wrapped in, what
+tells a player which pieces exist, and how the stream got here in the first
+place.
 
-```moonbit
-@lib.greet("moonbit")
-```
+> **Status: planned.** The repository is set up; nothing is
+> implemented yet.
 
-Run `moon run examples/tour` for the whole surface in one go.
+| Package | What it reads and writes | Specification |
+|:--|:--|:--|
+| `m3u8` | The HLS playlist, master and media alike | [RFC 8216](https://www.rfc-editor.org/rfc/rfc8216) |
+| `mpd` | The DASH manifest | ISO/IEC 23009-1 |
+| `ts` | MPEG-TS: packets, PAT, PMT, PES | ISO/IEC 13818-1 |
+| `mp4` | ISO base media format, whole files and fragments | ISO/IEC 14496-12 |
+| `rtmp` | The handshake, chunk stream and messages publishers push with | Adobe RTMP 1.0 |
 
-## Starting from this template
+Delivery itself needs nothing new: HLS and DASH travel over ordinary HTTP, which
+means [`moonhttp`](https://github.com/moonbitstack/moonhttp) for media types and
+range requests, and a server to answer them.
 
-1. `gh repo create moonbitstack/<name> --template moonbitstack/moonkit --public`
-2. Replace `CHANGE-ME` everywhere: `moon.mod` (name and repository), the two
-   `moon.pkg` files that import `lib`, and this file's title.
-3. Delete `bin/` if the repository ships no binary; delete `lib/` if it ships
-   only a binary. Most repositories here keep `lib/` and rename it to whatever
-   the package actually is — `base64/`, `sha2/`, `jwt/` — because a package is
-   named after what it does, not after its role.
-4. Fill in `keywords` and `description` in `moon.mod`. The description is what
-   mooncakes shows, so it says what the package is and what it is not.
-5. Write the specification link into every `moon.pkg`.
+## What is deliberately elsewhere
 
-## What is here and what is not
+| Thing | Where it lives | Why |
+|:--|:--|:--|
+| Peer connections, RTP, ICE | [`moonrtc`](https://github.com/moonbitstack/moonrtc) | Sub-second conversation and segmented broadcast are different problems with different limits |
+| Reading the MPD's XML | [`moonxml`](https://github.com/moonbitstack/moonxml) | A manifest is an XML document, and XML does not fit the JSON tree the rest of this family reads into |
+| Serving the segments | a server built on `moonhttp` | Nothing here opens a socket |
+| Audio and video codecs | nowhere — out of scope | This library packages media; it does not encode it |
 
-| Carried | Why |
-|:--|:--|
-| `.github/workflows/` | GitHub does not inherit workflows; every repository needs its own copy |
-| `moon.mod`, `lib/`, `bin/`, `examples/tour/` | The module layout, with the library and the binary separated the way cargo separates them |
-| `.gitignore`, `.moonignore` | The second one exists because `.gitignore`'s `!.git*` would otherwise pull the whole object database into a published tarball |
-| `LICENSE` | Apache-2.0, the same across the organisation |
-
-**Issue and pull-request templates are not here.** The organisation's `.github`
-repository supplies them to every repository that has none of its own; a copy
-here would shadow that one and then drift from it. A repository adds its own
-only when it needs something the organisation's does not cover.
-
-## The gate
-
-Every commit passes this, with each exit code seen to be zero:
+## Install
 
 ```bash
-moon clean && moon fmt && moon check --target all --deny-warn \
-  && moon build --target all && moon test --target all
+moon add moonbitstack/moonmedia
 ```
-
-Before a release, `moon info --target all && git diff --exit-code` as well: the
-generated interface is checked in, and a difference means the interface moved
-without anyone saying so.
-
-## Releasing
-
-Push a signed tag `v<version>`. `release.yml` runs the tests first and publishes
-only if they pass and the organisation variable `MOONCAKES_PUBLISH` is `true`.
-The major version stays at 0.
 
 ## Licence
 
-Apache-2.0.
+Apache-2.0. See [LICENSE](LICENSE).

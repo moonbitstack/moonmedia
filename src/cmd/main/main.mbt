@@ -4,8 +4,8 @@
 ///|
 /// The command this repository installs.
 ///
-///     moon run bin
+///     moon run src/cmd/main
 #coverage.skip
 fn main {
-  println(@lib.greet("moonbit"))
+  println(@moonmedia.greet("moonbit"))
 }

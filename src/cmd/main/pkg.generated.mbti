@@ -1,5 +1,5 @@
 // Generated using `moon info`, DON'T EDIT IT
-package "moonbitstack/moonmedia/bin"
+package "moonbitstack/moonmedia/cmd/main"
 
 // Values
 

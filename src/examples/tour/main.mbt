@@ -5,8 +5,8 @@
 /// The whole surface in one run, so a reader can see what this is for before
 /// reading any of it.
 ///
-///     moon run examples/tour
+///     moon run src/examples/tour
 #coverage.skip
 fn main {
-  println(@lib.greet("moonbit"))
+  println(@moonmedia.greet("moonbit"))
 }

@@ -1,0 +1,12 @@
+// HLS playlists, RFC 8216 and the low-latency additions of RFC 8216bis.
+// https://www.rfc-editor.org/rfc/rfc8216
+//
+// Text in, data out. The package never touches a socket or a file: a playlist
+// arrives as the bytes an HTTP response carried, and leaves as the bytes to
+// write into one.
+import {
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+}

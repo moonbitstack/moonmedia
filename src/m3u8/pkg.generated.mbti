@@ -1,0 +1,331 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moonmedia/m3u8"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+
+// Errors
+pub(all) suberror PlaylistError {
+  Malformed(at~ : Int32, want~ : String, got~ : String)
+}
+pub fn PlaylistError::output(Self, &Logger) -> Unit
+pub fn PlaylistError::to_string(Self) -> String
+pub impl Show for PlaylistError
+
+// Types and methods
+pub(all) struct ByteRange {
+  mut length : Int64
+  mut offset : Int64?
+} derive(Eq, @debug.Debug)
+pub fn ByteRange::equal(Self, Self) -> Bool
+pub fn ByteRange::new(Int64, offset? : Int64) -> Self
+pub fn ByteRange::not_equal(Self, Self) -> Bool
+pub fn ByteRange::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Cipher {
+  None
+  Aes128
+  SampleAes
+  Other(String)
+} derive(Eq, @debug.Debug)
+pub fn Cipher::code(Self) -> String
+pub fn Cipher::equal(Self, Self) -> Bool
+pub fn Cipher::not_equal(Self, Self) -> Bool
+pub fn Cipher::of(StringView) -> Self
+pub fn Cipher::to_repr(Self) -> @debug.Repr
+
+pub(all) struct DateRange {
+  mut id : String
+  mut class_ : String?
+  mut start_date : String?
+  mut end_date : String?
+  mut duration : Double?
+  mut planned_duration : Double?
+  mut scte35_cmd : String?
+  mut scte35_out : String?
+  mut scte35_in : String?
+  mut end_on_next : Bool
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn DateRange::equal(Self, Self) -> Bool
+pub fn DateRange::new(String, start_date? : String) -> Self
+pub fn DateRange::not_equal(Self, Self) -> Bool
+pub fn DateRange::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Define {
+  mut name : String?
+  mut value : String?
+  mut import_ : String?
+  mut queryparam : String?
+} derive(Eq, @debug.Debug)
+pub fn Define::equal(Self, Self) -> Bool
+pub fn Define::new(String, String) -> Self
+pub fn Define::not_equal(Self, Self) -> Bool
+pub fn Define::to_repr(Self) -> @debug.Repr
+
+pub(all) struct IFrameStream {
+  mut uri : String
+  mut bandwidth : Int32?
+  mut average_bandwidth : Int32?
+  mut codecs : String?
+  mut resolution : Resolution?
+  mut hdcp_level : String?
+  mut video_range : String?
+  mut pathway_id : String?
+  mut stable_variant_id : String?
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn IFrameStream::equal(Self, Self) -> Bool
+pub fn IFrameStream::new(String, bandwidth? : Int32) -> Self
+pub fn IFrameStream::not_equal(Self, Self) -> Bool
+pub fn IFrameStream::to_repr(Self) -> @debug.Repr
+
+pub(all) struct InitSection {
+  mut uri : String
+  mut byte_range : ByteRange?
+} derive(Eq, @debug.Debug)
+pub fn InitSection::equal(Self, Self) -> Bool
+pub fn InitSection::new(String, byte_range? : ByteRange) -> Self
+pub fn InitSection::not_equal(Self, Self) -> Bool
+pub fn InitSection::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Key {
+  mut cipher : Cipher
+  mut uri : String?
+  mut iv : String?
+  mut key_format : String?
+  mut key_format_versions : String?
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn Key::equal(Self, Self) -> Bool
+pub fn Key::is_plain(Self) -> Bool
+pub fn Key::new(String, cipher? : Cipher, iv? : String, key_format? : String, key_format_versions? : String) -> Self
+pub fn Key::not_equal(Self, Self) -> Bool
+pub fn Key::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Master {
+  mut version : Int32?
+  mut independent_segments : Bool
+  mut start : Start?
+  mut defines : Array[Define]
+  mut session_data : Array[SessionData]
+  mut session_keys : Array[Key]
+  mut renditions : Array[Rendition]
+  mut variants : Array[Variant]
+  mut i_frame_streams : Array[IFrameStream]
+  mut unknown : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn Master::encode(Self) -> String
+pub fn Master::equal(Self, Self) -> Bool
+pub fn Master::new() -> Self
+pub fn Master::not_equal(Self, Self) -> Bool
+pub fn Master::to_repr(Self) -> @debug.Repr
+
+pub(all) enum MediaKind {
+  Audio
+  Video
+  Subtitles
+  ClosedCaptions
+  Other(String)
+} derive(Eq, @debug.Debug)
+pub fn MediaKind::code(Self) -> String
+pub fn MediaKind::equal(Self, Self) -> Bool
+pub fn MediaKind::not_equal(Self, Self) -> Bool
+pub fn MediaKind::of(StringView) -> Self
+pub fn MediaKind::to_repr(Self) -> @debug.Repr
+
+pub(all) struct MediaPlaylist {
+  mut version : Int32?
+  mut target_duration : Int32
+  mut media_sequence : Int64
+  mut discontinuity_sequence : Int64
+  mut playlist_type : PlaylistType?
+  mut i_frames_only : Bool
+  mut independent_segments : Bool
+  mut allow_cache : Bool?
+  mut end_list : Bool
+  mut start : Start?
+  mut server_control : ServerControl?
+  mut part_inf : Double?
+  mut skip : Int32?
+  mut defines : Array[Define]
+  mut date_ranges : Array[DateRange]
+  mut segments : Array[Segment]
+  mut next_parts : Array[Part]
+  mut preload_hint : PreloadHint?
+  mut rendition_reports : Array[RenditionReport]
+  mut unknown : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn MediaPlaylist::encode(Self) -> String
+pub fn MediaPlaylist::equal(Self, Self) -> Bool
+pub fn MediaPlaylist::new(Int32) -> Self
+pub fn MediaPlaylist::not_equal(Self, Self) -> Bool
+pub fn MediaPlaylist::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Part {
+  mut uri : String
+  mut duration : Double
+  mut independent : Bool
+  mut byte_range : ByteRange?
+  mut gap : Bool
+} derive(Eq, @debug.Debug)
+pub fn Part::equal(Self, Self) -> Bool
+pub fn Part::new(String, Double, independent? : Bool, byte_range? : ByteRange, gap? : Bool) -> Self
+pub fn Part::not_equal(Self, Self) -> Bool
+pub fn Part::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Playlist {
+  MasterPlaylist(Master)
+  MediaPlaylist(MediaPlaylist)
+} derive(Eq, @debug.Debug)
+pub fn Playlist::encode(Self) -> String
+pub fn Playlist::equal(Self, Self) -> Bool
+pub fn Playlist::is_master(Self) -> Bool
+pub fn Playlist::master(Self) -> Master?
+pub fn Playlist::media(Self) -> MediaPlaylist?
+pub fn Playlist::not_equal(Self, Self) -> Bool
+pub fn Playlist::parse(StringView) -> Self raise PlaylistError
+pub fn Playlist::to_repr(Self) -> @debug.Repr
+
+pub(all) enum PlaylistType {
+  Event
+  Vod
+  Other(String)
+} derive(Eq, @debug.Debug)
+pub fn PlaylistType::equal(Self, Self) -> Bool
+pub fn PlaylistType::not_equal(Self, Self) -> Bool
+pub fn PlaylistType::to_repr(Self) -> @debug.Repr
+
+pub(all) struct PreloadHint {
+  mut kind : String
+  mut uri : String
+  mut byte_range : ByteRange?
+  mut start : Int64?
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn PreloadHint::equal(Self, Self) -> Bool
+pub fn PreloadHint::new(String, String, byte_range? : ByteRange, start? : Int64) -> Self
+pub fn PreloadHint::not_equal(Self, Self) -> Bool
+pub fn PreloadHint::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Rendition {
+  mut kind : MediaKind
+  mut group_id : String
+  mut name : String
+  mut uri : String?
+  mut language : String?
+  mut assoc_language : String?
+  mut characteristics : String?
+  mut channels : String?
+  mut instream_id : String?
+  mut stable_rendition_id : String?
+  mut pathway_id : String?
+  mut default : Bool
+  mut autoselect : Bool
+  mut forced : Bool
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn Rendition::equal(Self, Self) -> Bool
+pub fn Rendition::new(MediaKind, String, String, uri? : String) -> Self
+pub fn Rendition::not_equal(Self, Self) -> Bool
+pub fn Rendition::to_repr(Self) -> @debug.Repr
+
+pub(all) struct RenditionReport {
+  mut uri : String
+  mut last_msn : Int64?
+  mut last_part : Int32?
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn RenditionReport::equal(Self, Self) -> Bool
+pub fn RenditionReport::new(String, last_msn? : Int64, last_part? : Int32) -> Self
+pub fn RenditionReport::not_equal(Self, Self) -> Bool
+pub fn RenditionReport::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Resolution {
+  mut width : Int32
+  mut height : Int32
+} derive(Eq, @debug.Debug)
+pub fn Resolution::equal(Self, Self) -> Bool
+pub fn Resolution::new(Int32, Int32) -> Self
+pub fn Resolution::not_equal(Self, Self) -> Bool
+pub fn Resolution::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Segment {
+  mut uri : String
+  mut duration : Double
+  mut title : String?
+  mut byte_range : ByteRange?
+  mut discontinuity : Bool
+  mut program_date_time : String?
+  mut gap : Bool
+  mut key : Key?
+  mut map : InitSection?
+  mut parts : Array[Part]
+} derive(Eq, @debug.Debug)
+pub fn Segment::equal(Self, Self) -> Bool
+pub fn Segment::new(String, Double, title? : String) -> Self
+pub fn Segment::not_equal(Self, Self) -> Bool
+pub fn Segment::to_repr(Self) -> @debug.Repr
+
+pub(all) struct ServerControl {
+  mut can_skip_until : Double?
+  mut can_skip_date_ranges : Bool
+  mut hold_back : Double?
+  mut part_hold_back : Double?
+  mut can_block_reload : Bool
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn ServerControl::equal(Self, Self) -> Bool
+pub fn ServerControl::new() -> Self
+pub fn ServerControl::not_equal(Self, Self) -> Bool
+pub fn ServerControl::to_repr(Self) -> @debug.Repr
+
+pub(all) struct SessionData {
+  mut data_id : String
+  mut value : String?
+  mut uri : String?
+  mut language : String?
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn SessionData::equal(Self, Self) -> Bool
+pub fn SessionData::new(String, value? : String, uri? : String, language? : String) -> Self
+pub fn SessionData::not_equal(Self, Self) -> Bool
+pub fn SessionData::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Start {
+  mut time_offset : Double
+  mut precise : Bool
+} derive(Eq, @debug.Debug)
+pub fn Start::equal(Self, Self) -> Bool
+pub fn Start::new(Double, precise? : Bool) -> Self
+pub fn Start::not_equal(Self, Self) -> Bool
+pub fn Start::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Variant {
+  mut uri : String
+  mut bandwidth : Int32?
+  mut average_bandwidth : Int32?
+  mut codecs : String?
+  mut resolution : Resolution?
+  mut frame_rate : Double?
+  mut hdcp_level : String?
+  mut audio : String?
+  mut video : String?
+  mut subtitles : String?
+  mut closed_captions : String?
+  mut video_range : String?
+  mut pathway_id : String?
+  mut stable_variant_id : String?
+  mut extra : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn Variant::equal(Self, Self) -> Bool
+pub fn Variant::new(String, bandwidth? : Int32, codecs? : String) -> Self
+pub fn Variant::not_equal(Self, Self) -> Bool
+pub fn Variant::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

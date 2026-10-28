@@ -1,2 +1,10 @@
-// What this package implements, and a first-hand link to the specification it
-// implements. A package without that link is not finished.
+// The vertical slice: a fragmented or plain MP4 in, an HLS package out.
+import {
+  "moonbitlang/core/debug",
+  "moonbitstack/moonmedia/m3u8",
+  "moonbitstack/moonmedia/mp4",
+}
+
+import {
+  "moonbitlang/core/encoding/base64",
+} for "test"

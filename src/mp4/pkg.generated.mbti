@@ -1,0 +1,215 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moonmedia/mp4"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn encode(Array[Box]) -> Bytes
+
+pub fn ftyp(StringView, Array[String]) -> Box
+
+pub fn mdat(Bytes) -> Box
+
+pub fn mfhd(Int32) -> Box
+
+pub fn movie_header(Box) -> MovieHeader raise Mp4Error
+
+pub fn parse(BytesView) -> Array[Box] raise Mp4Error
+
+pub fn segment_index(Box) -> SegmentIndex raise Mp4Error
+
+pub fn tfdt(Int64) -> Box
+
+pub fn tfhd(Int32) -> Box
+
+pub fn trun(Array[SampleData], Int32) -> Box
+
+// Errors
+pub(all) suberror Mp4Error {
+  Malformed(at~ : Int32, want~ : String, got~ : String)
+}
+pub fn Mp4Error::output(Self, &Logger) -> Unit
+pub fn Mp4Error::to_string(Self) -> String
+pub impl Show for Mp4Error
+
+// Types and methods
+pub(all) struct Box {
+  type_ : String
+  usertype : Bytes?
+  large : Bool
+  content : Content
+} derive(Eq, @debug.Debug)
+pub fn Box::boxes(Self) -> Array[Self]
+pub fn Box::byte_length(Self) -> Int32
+pub fn Box::bytes(StringView, Bytes) -> Self
+pub fn Box::child(Self, StringView) -> Self?
+pub fn Box::children(StringView, Array[Self]) -> Self
+pub fn Box::children_of(Self, StringView) -> Array[Self]
+pub fn Box::encode(Self) -> Bytes
+pub fn Box::equal(Self, Self) -> Bool
+pub fn Box::fourcc(Self) -> StringView
+pub fn Box::is_type(Self, StringView) -> Bool
+pub fn Box::not_equal(Self, Self) -> Bool
+pub fn Box::raw(Self) -> Bytes
+pub fn Box::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Content {
+  Children(prefix~ : Bytes, boxes~ : Array[Box])
+  Bytes(raw~ : Bytes)
+} derive(Eq, @debug.Debug)
+pub fn Content::equal(Self, Self) -> Bool
+pub fn Content::not_equal(Self, Self) -> Bool
+pub fn Content::to_repr(Self) -> @debug.Repr
+
+pub(all) struct FileType {
+  major : String
+  minor : Int32
+  compatible : Array[String]
+} derive(Eq, @debug.Debug)
+pub fn FileType::encode(Self) -> Bytes
+pub fn FileType::equal(Self, Self) -> Bool
+pub fn FileType::not_equal(Self, Self) -> Bool
+pub fn FileType::of(Bytes) -> Self raise Mp4Error
+pub fn FileType::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Fragment {
+  sequence : Int32
+  start : Int32
+  end : Int32
+  runs : Array[Run]
+} derive(Eq, @debug.Debug)
+pub fn Fragment::equal(Self, Self) -> Bool
+pub fn Fragment::not_equal(Self, Self) -> Bool
+pub fn Fragment::to_repr(Self) -> @debug.Repr
+
+pub(all) struct FragmentTrack {
+  track_id : Int32
+  base_decode_time : Int64
+  samples : Array[SampleData]
+} derive(Eq, @debug.Debug)
+pub fn FragmentTrack::equal(Self, Self) -> Bool
+pub fn FragmentTrack::not_equal(Self, Self) -> Bool
+pub fn FragmentTrack::to_repr(Self) -> @debug.Repr
+
+pub(all) struct IndexReference {
+  reference_type : Bool
+  subsegment_duration : Int64
+  starts_with_sap : Bool
+  sap_type : Int32
+  sap_delta_time : Int64
+} derive(Eq, @debug.Debug)
+pub fn IndexReference::equal(Self, Self) -> Bool
+pub fn IndexReference::not_equal(Self, Self) -> Bool
+pub fn IndexReference::to_repr(Self) -> @debug.Repr
+
+pub(all) struct MovieFragment {
+  sequence : Int32
+  tracks : Array[FragmentTrack]
+} derive(Eq, @debug.Debug)
+pub fn MovieFragment::duration(Self, Int64) -> Double
+pub fn MovieFragment::encode(Self) -> Bytes
+pub fn MovieFragment::equal(Self, Self) -> Bool
+pub fn MovieFragment::new(Int32, Array[FragmentTrack]) -> Self
+pub fn MovieFragment::not_equal(Self, Self) -> Bool
+pub fn MovieFragment::sample_bytes(Self) -> Bytes
+pub fn MovieFragment::to_repr(Self) -> @debug.Repr
+
+pub(all) struct MovieHeader {
+  timescale : Int64
+  duration : Int64
+} derive(Eq, @debug.Debug)
+pub fn MovieHeader::equal(Self, Self) -> Bool
+pub fn MovieHeader::not_equal(Self, Self) -> Bool
+pub fn MovieHeader::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Mp4 {
+  data : Bytes
+  boxes : Array[Box]
+}
+pub fn Mp4::box(Self, StringView) -> Box?
+pub fn Mp4::encode(Self) -> Bytes
+pub fn Mp4::file_type(Self) -> FileType? raise Mp4Error
+pub fn Mp4::fragments(Self) -> Array[Fragment] raise Mp4Error
+pub fn Mp4::init_section(Self) -> Bytes raise Mp4Error
+pub fn Mp4::is_fragmented(Self) -> Bool
+pub fn Mp4::movie(Self) -> Box?
+pub fn Mp4::parse(BytesView) -> Self raise Mp4Error
+pub fn Mp4::tracks(Self) -> Array[Track] raise Mp4Error
+
+pub(all) struct Run {
+  track_id : Int32
+  base_decode_time : Int64
+  samples : Array[Sample]
+} derive(Eq, @debug.Debug)
+pub fn Run::equal(Self, Self) -> Bool
+pub fn Run::not_equal(Self, Self) -> Bool
+pub fn Run::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Sample {
+  offset : Int32
+  size : Int32
+  dts : Int64
+  duration : Int64
+  composition_offset : Int64
+  sync : Bool
+} derive(Eq, @debug.Debug)
+pub fn Sample::equal(Self, Self) -> Bool
+pub fn Sample::not_equal(Self, Self) -> Bool
+pub fn Sample::pts(Self) -> Int64
+pub fn Sample::seconds(Self, Int64) -> Double
+pub fn Sample::to_repr(Self) -> @debug.Repr
+
+pub(all) struct SampleData {
+  data : Bytes
+  duration : Int64
+  composition_offset : Int64
+  sync : Bool
+} derive(Eq, @debug.Debug)
+pub fn SampleData::equal(Self, Self) -> Bool
+pub fn SampleData::not_equal(Self, Self) -> Bool
+pub fn SampleData::to_repr(Self) -> @debug.Repr
+
+pub(all) struct SegmentIndex {
+  reference_id : Int32
+  timescale : Int64
+  earliest_presentation_time : Int64
+  first_offset : Int64
+  references : Array[IndexReference]
+} derive(Eq, @debug.Debug)
+pub fn SegmentIndex::equal(Self, Self) -> Bool
+pub fn SegmentIndex::not_equal(Self, Self) -> Bool
+pub fn SegmentIndex::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Track {
+  id : Int32
+  kind : TrackKind
+  timescale : Int64
+  duration : Int64
+  language : String
+  codec : String
+  width : Int32
+  height : Int32
+  sample_rate : Int32
+  channels : Int32
+  samples : Array[Sample]
+} derive(Eq, @debug.Debug)
+pub fn Track::equal(Self, Self) -> Bool
+pub fn Track::not_equal(Self, Self) -> Bool
+pub fn Track::to_repr(Self) -> @debug.Repr
+
+pub(all) enum TrackKind {
+  Video
+  Audio
+  Subtitle
+  Hint
+  Other(String)
+} derive(Eq, @debug.Debug)
+pub fn TrackKind::equal(Self, Self) -> Bool
+pub fn TrackKind::not_equal(Self, Self) -> Bool
+pub fn TrackKind::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

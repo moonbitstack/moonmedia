@@ -281,6 +281,20 @@ test "an initialisation section describes the codec and holds no frames" {
 }
 
 ///|
+test "a fragmented file's initialisation section keeps the codec" {
+  let file = @mp4.Mp4::parse(bytes_of(fragmented)[:])
+  let init = file.init_section()
+  let init_file = @mp4.Mp4::parse(init[:])
+  // The movie header it came with had no sample table to strip: a fragmented
+  // file keeps its frames in the fragments, and its `mvex` says how.
+  assert_eq(init_file.boxes.map(fn(b) { b.type_ }), ["ftyp", "moov"])
+  assert_eq(init_file.movie().unwrap().child("mvex") != None, true)
+  assert_eq(init_file.tracks()[0].codec, "avc1.42d00b")
+  // The frames of the original are still there to be cut.
+  assert_eq(file.tracks()[0].samples.length(), 2)
+}
+
+///|
 test "a fragment built here reads back as the samples that went in" {
   let samples : Array[@mp4.SampleData] = [
     {

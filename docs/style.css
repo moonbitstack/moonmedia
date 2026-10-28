@@ -270,7 +270,7 @@ html::-webkit-scrollbar {
   pointer-events: none;
   opacity: 0;
   transition: opacity 240ms ease;
-  background-color: color-mix(in oklab, var(--paper) 70%, transparent);
+  background-color: transparent;
   border-left: 1px solid var(--rule-soft);
   background-image: radial-gradient(3.5px 3px at 50% 50%, var(--rule) 96%, transparent 100%);
   background-size: 18px 22px;

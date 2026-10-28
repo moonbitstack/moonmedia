@@ -1667,7 +1667,7 @@ h1 {
 .bytes span.f-pid { background: color-mix(in oklab, var(--amber) 24%, var(--paper)); color: var(--ink); border-color: var(--amber); }
 .bytes span.f-af { background: color-mix(in oklab, var(--ink-2) 18%, var(--paper)); color: var(--ink); }
 .bytes span.f-pcr { background: color-mix(in oklab, var(--amber) 42%, var(--paper)); color: var(--ink); border-color: var(--amber); }
-.bytes span.f-payload { background: var(--paper-2); }
+.bytes span.f-payload { background: var(--paper); }
 
 .bytes span.on {
   outline: 2px solid var(--ink);

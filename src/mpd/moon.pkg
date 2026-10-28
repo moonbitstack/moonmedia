@@ -1,0 +1,14 @@
+// MPEG-DASH manifests, ISO/IEC 23009-1.
+//
+// https://www.iso.org/standard/83321.html
+//
+// Text in, data out. A manifest is an XML document, and the reader for one is
+// here rather than in a dependency because a manifest uses a small, fixed part
+// of XML: elements, attributes and text, with no namespaces to resolve and no
+// entities beyond the five the specification defines.
+import {
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitlang/core/string",
+}

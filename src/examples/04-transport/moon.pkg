@@ -1,0 +1,7 @@
+// A transport stream built from tables and frames, then read back.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitlang/core/buffer",
+  "moonbitstack/moonmedia/ts",
+}

@@ -1,0 +1,6 @@
+// A DASH manifest built from parts, printed as the XML a player reads.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitstack/moonmedia/mpd",
+}

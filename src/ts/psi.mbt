@@ -152,6 +152,12 @@ pub extend Program with Eq::{equal, not_equal}
 pub extend Program with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
+/// A programme of `number` whose map table is on `pid`.
+pub fn Program::new(number : Int32, pid : Int32) -> Program {
+  { number, pid, }
+}
+
+///|
 /// The programme association table: which programme is on which identifier.
 pub(all) struct Pat {
   transport_stream : Int32
@@ -189,6 +195,20 @@ pub fn Pat::of(section : Section) -> Pat raise TsError {
     transport_stream: section.table_id_extension,
     version: section.version,
     programs,
+  }
+}
+
+///|
+/// A table of `programs` for the stream `transport_stream`.
+pub fn Pat::new(
+  transport_stream? : Int32,
+  version? : Int32,
+  programs? : Array[Program],
+) -> Pat {
+  {
+    transport_stream: transport_stream.unwrap_or(1),
+    version: version.unwrap_or(0),
+    programs: programs.unwrap_or([]),
   }
 }
 
@@ -252,6 +272,16 @@ pub extend Stream with Eq::{equal, not_equal}
 
 ///|
 pub extend Stream with @moonbitlang/core/debug.Debug::{to_repr}
+
+///|
+/// A stream of `stream_type` on `pid`, with the descriptors that describe it.
+pub fn Stream::new(
+  stream_type : Int32,
+  pid : Int32,
+  descriptors? : Bytes,
+) -> Stream {
+  { stream_type, pid, descriptors: descriptors.unwrap_or(Bytes::new(0)), }
+}
 
 ///|
 /// The programme map table: what a programme is made of, and which packet
@@ -324,6 +354,24 @@ pub fn Pmt::of(section : Section) -> Pmt raise TsError {
     version: section.version,
     descriptors,
     streams,
+  }
+}
+
+///|
+/// A table of `streams` for programme `program`, timed by `pcr_pid`.
+pub fn Pmt::new(
+  program? : Int32,
+  pcr_pid? : Int32,
+  version? : Int32,
+  descriptors? : Bytes,
+  streams? : Array[Stream],
+) -> Pmt {
+  {
+    program: program.unwrap_or(1),
+    pcr_pid: pcr_pid.unwrap_or(0x100),
+    version: version.unwrap_or(0),
+    descriptors: descriptors.unwrap_or(Bytes::new(0)),
+    streams: streams.unwrap_or([]),
   }
 }
 

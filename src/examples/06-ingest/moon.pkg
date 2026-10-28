@@ -1,0 +1,6 @@
+// What an ingest server does with a publisher: the session, driven by hand.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitstack/moonmedia/rtmp",
+}

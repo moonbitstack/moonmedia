@@ -1,0 +1,6 @@
+// The two playlists a player reads, built and then read back.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitstack/moonmedia/m3u8",
+}

@@ -1,0 +1,7 @@
+// The box tree of an MP4, read, walked and written back.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitlang/core/encoding/utf8",
+  "moonbitstack/moonmedia/mp4",
+}

@@ -153,7 +153,7 @@ test "the master playlist names the codecs a player has to support" {
   assert_eq(master.variants[0].codecs, Some("avc1.42c00a,mp4a.40.2"))
   assert_eq(master.variants[0].resolution, Some(@m3u8.Resolution::new(32, 32)))
   assert_true(master.variants[0].bandwidth.unwrap() > 0)
-  assert_eq(master.i_frame_streams.length(), 1)
+  assert_eq(master.i_frame_streams.length(), 0)
   let text = master.encode()
   assert_true(text.contains("#EXT-X-STREAM-INF:"))
 }

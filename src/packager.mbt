@@ -231,6 +231,10 @@ pub fn Packager::media_playlist(
 /// `bandwidth` is what the variant costs per second. When it is left out the
 /// packager measures what it produced, which is close enough for a player
 /// choosing between renditions and pointless as a description of the source.
+///
+/// There is no `EXT-X-I-FRAME-STREAM-INF`: a list of key frames only is a
+/// different playlist, with different segments, and pointing this one at that
+/// tag would describe it as something it is not.
 pub fn Packager::master_playlist(
   self : Packager,
   uri? : StringView,
@@ -278,16 +282,6 @@ pub fn Packager::master_playlist(
       }
   }
   master.variants.push(variant)
-  match video {
-    Some(_) => {
-      let iframe = @m3u8.IFrameStream::new(
-        name,
-        bandwidth=bandwidth.unwrap_or(measured),
-      )
-      master.i_frame_streams.push(iframe)
-    }
-    None => ()
-  }
   master
 }
 

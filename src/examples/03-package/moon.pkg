@@ -1,0 +1,8 @@
+// The vertical slice: an MP4 in, an HLS package out.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitlang/core/encoding/base64",
+  "moonbitstack/moonmedia",
+  "moonbitstack/moonmedia/mp4",
+}

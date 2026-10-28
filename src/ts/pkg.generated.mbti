@@ -84,6 +84,7 @@ pub(all) struct Pat {
 } derive(Eq, @debug.Debug)
 pub fn Pat::encode(Self) -> Bytes
 pub fn Pat::equal(Self, Self) -> Bool
+pub fn Pat::new(transport_stream? : Int32, version? : Int32, programs? : Array[Program]) -> Self
 pub fn Pat::not_equal(Self, Self) -> Bool
 pub fn Pat::of(Section) -> Self raise TsError
 pub fn Pat::section(Self) -> Section
@@ -115,6 +116,7 @@ pub(all) struct Pmt {
 } derive(Eq, @debug.Debug)
 pub fn Pmt::encode(Self) -> Bytes
 pub fn Pmt::equal(Self, Self) -> Bool
+pub fn Pmt::new(program? : Int32, pcr_pid? : Int32, version? : Int32, descriptors? : Bytes, streams? : Array[Stream]) -> Self
 pub fn Pmt::not_equal(Self, Self) -> Bool
 pub fn Pmt::of(Section) -> Self raise TsError
 pub fn Pmt::section(Self) -> Section
@@ -125,6 +127,7 @@ pub(all) struct Program {
   pid : Int32
 } derive(Eq, @debug.Debug)
 pub fn Program::equal(Self, Self) -> Bool
+pub fn Program::new(Int32, Int32) -> Self
 pub fn Program::not_equal(Self, Self) -> Bool
 pub fn Program::to_repr(Self) -> @debug.Repr
 
@@ -152,6 +155,7 @@ pub(all) struct Stream {
   descriptors : Bytes
 } derive(Eq, @debug.Debug)
 pub fn Stream::equal(Self, Self) -> Bool
+pub fn Stream::new(Int32, Int32, descriptors? : Bytes) -> Self
 pub fn Stream::not_equal(Self, Self) -> Bool
 pub fn Stream::to_repr(Self) -> @debug.Repr
 

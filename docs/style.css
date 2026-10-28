@@ -40,54 +40,60 @@
    chosen. Both blocks hold the same tokens on purpose — add a colour, add it
    to both. */
 :root[data-theme="dark"] {
-      color-scheme: dark;
-      --paper: #14100d;
-      --paper-2: #1c1713;
-      --paper-3: #251d17;
-      --ink: #ece0c8;
-      --ink-2: #cdba9c;
-      --muted: #a08d72;
-      --rule: #3a2f25;
-      --rule-soft: #2b221b;
-      --amber: #e0a458;
-      --amber-2: #f0bd76;
-      --stamp: #d9684f;
-      --edge: #000;
-      --film: #0c0a08;
-      --film-2: #161210;
-      --hole: #2b2119;
-      --frame-bg: #1f1915;
-      --on-amber: #160e05;
-      --code-bg: #0c0a08;
-      --code-ink: #e9dcc3;
-      --code-dim: #8c7a61;
-      --selection: #4a3826;
+  color-scheme: dark;
+  --paper: #14100d;
+  --paper-2: #1c1713;
+  --paper-3: #251d17;
+  --ink: #ece0c8;
+  --ink-2: #cdba9c;
+  --muted: #a08d72;
+  --rule: #3a2f25;
+  --rule-soft: #2b221b;
+  --amber: #e0a458;
+  --amber-2: #f0bd76;
+  --stamp: #d9684f;
+  --edge: #000;
+  --film: #0c0a08;
+  --film-2: #161210;
+  --hole: #2b2119;
+  --frame-bg: #1f1915;
+  --on-amber: #160e05;
+  --code-bg: #0c0a08;
+  --code-ink: #e9dcc3;
+  --code-dim: #8c7a61;
+  --selection: #4a3826;
+  --grain-opacity: 0.07;
+  --grain-blend: screen;
+  --vignette-opacity: 0.7;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-        color-scheme: dark;
-        --paper: #14100d;
-        --paper-2: #1c1713;
-        --paper-3: #251d17;
-        --ink: #ece0c8;
-        --ink-2: #cdba9c;
-        --muted: #a08d72;
-        --rule: #3a2f25;
-        --rule-soft: #2b221b;
-        --amber: #e0a458;
-        --amber-2: #f0bd76;
-        --stamp: #d9684f;
-        --edge: #000;
-        --film: #0c0a08;
-        --film-2: #161210;
-        --hole: #2b2119;
-        --frame-bg: #1f1915;
-        --on-amber: #160e05;
-        --code-bg: #0c0a08;
-        --code-ink: #e9dcc3;
-        --code-dim: #8c7a61;
-        --selection: #4a3826;
+    color-scheme: dark;
+    --paper: #14100d;
+    --paper-2: #1c1713;
+    --paper-3: #251d17;
+    --ink: #ece0c8;
+    --ink-2: #cdba9c;
+    --muted: #a08d72;
+    --rule: #3a2f25;
+    --rule-soft: #2b221b;
+    --amber: #e0a458;
+    --amber-2: #f0bd76;
+    --stamp: #d9684f;
+    --edge: #000;
+    --film: #0c0a08;
+    --film-2: #161210;
+    --hole: #2b2119;
+    --frame-bg: #1f1915;
+    --on-amber: #160e05;
+    --code-bg: #0c0a08;
+    --code-ink: #e9dcc3;
+    --code-dim: #8c7a61;
+    --selection: #4a3826;
+    --grain-opacity: 0.07;
+    --grain-blend: screen;
+    --vignette-opacity: 0.7;
   }
 }
 

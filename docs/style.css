@@ -30,32 +30,64 @@
   --mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
   --max: 1180px;
   --gap: clamp(18px, 3vw, 34px);
+  --grain-opacity: 0.055;
+  --grain-blend: multiply;
+  --vignette-opacity: 0.5;
+}
+
+/* The screening room. One palette, two ways to reach it: a reader who pressed
+   the button, and a system that asked for dark and a reader who has not
+   chosen. Both blocks hold the same tokens on purpose — add a colour, add it
+   to both. */
+:root[data-theme="dark"] {
+      color-scheme: dark;
+      --paper: #14100d;
+      --paper-2: #1c1713;
+      --paper-3: #251d17;
+      --ink: #ece0c8;
+      --ink-2: #cdba9c;
+      --muted: #a08d72;
+      --rule: #3a2f25;
+      --rule-soft: #2b221b;
+      --amber: #e0a458;
+      --amber-2: #f0bd76;
+      --stamp: #d9684f;
+      --edge: #000;
+      --film: #0c0a08;
+      --film-2: #161210;
+      --hole: #2b2119;
+      --frame-bg: #1f1915;
+      --on-amber: #160e05;
+      --code-bg: #0c0a08;
+      --code-ink: #e9dcc3;
+      --code-dim: #8c7a61;
+      --selection: #4a3826;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    color-scheme: dark;
-    --paper: #14100d;
-    --paper-2: #1c1713;
-    --paper-3: #251d17;
-    --ink: #ece0c8;
-    --ink-2: #cdba9c;
-    --muted: #a08d72;
-    --rule: #3a2f25;
-    --rule-soft: #2b221b;
-    --amber: #e0a458;
-    --amber-2: #f0bd76;
-    --stamp: #d9684f;
-    --edge: #000;
-    --film: #0c0a08;
-    --film-2: #161210;
-    --hole: #2b2119;
-    --frame-bg: #1f1915;
-    --on-amber: #160e05;
-    --code-bg: #0c0a08;
-    --code-ink: #e9dcc3;
-    --code-dim: #8c7a61;
-    --selection: #4a3826;
+  :root:not([data-theme="light"]) {
+        color-scheme: dark;
+        --paper: #14100d;
+        --paper-2: #1c1713;
+        --paper-3: #251d17;
+        --ink: #ece0c8;
+        --ink-2: #cdba9c;
+        --muted: #a08d72;
+        --rule: #3a2f25;
+        --rule-soft: #2b221b;
+        --amber: #e0a458;
+        --amber-2: #f0bd76;
+        --stamp: #d9684f;
+        --edge: #000;
+        --film: #0c0a08;
+        --film-2: #161210;
+        --hole: #2b2119;
+        --frame-bg: #1f1915;
+        --on-amber: #160e05;
+        --code-bg: #0c0a08;
+        --code-ink: #e9dcc3;
+        --code-dim: #8c7a61;
+        --selection: #4a3826;
   }
 }
 
@@ -97,18 +129,101 @@ body {
   color: var(--ink);
 }
 
-/* Scrollbars: the platform's own is the one thing that breaks the paper. The
-   standard properties come first, then the WebKit ones only where the standard
-   ones are ignored — setting scrollbar-color makes Chrome drop the rest. */
-html {
-  scrollbar-width: thin;
+
+/* Screen furniture — the header, the tabs, the strip, the readouts — does not
+   take a text selection, and nothing in it starts a drag ghost when it is
+   pulled at. Prose, code, signatures and the playlist log still select: those
+   are the things a reader copies. */
+.perf,
+.grain,
+.vignette,
+.site-head,
+.brand,
+.nav,
+.reel,
+.strip-note,
+.strip,
+.frame,
+h1,
+.numbers,
+.card .idx,
+.intertitle,
+.demo-head,
+.presets,
+.chip,
+.verdict,
+.cues,
+.demo-foot,
+.stamp,
+.teaser .kicker,
+.page-head .reel,
+.toc,
+.tabs,
+.tab,
+.frames,
+.reel-frame,
+.cuts,
+.cut,
+.readout,
+.ruler,
+.ruler-note,
+.bytes,
+.legend,
+.tree,
+.box-row,
+.api-side,
+.pkg > h2,
+.group,
+.entry .kind,
+.site-foot {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
 }
 
-@supports not selector(::-webkit-scrollbar) {
-  html {
-    scrollbar-width: thin;
-    scrollbar-color: var(--rule) var(--paper-2);
-  }
+a,
+img,
+svg,
+button,
+.frame,
+.btn,
+.chip,
+.tab,
+.cut,
+.reel-frame {
+  -webkit-user-drag: none;
+}
+
+/* Form fields and the log opt back in, whatever they sit inside. */
+textarea,
+input,
+.prose,
+.prose p,
+.prose li,
+.prose table,
+.doc,
+.sig,
+.fields,
+.variants,
+pre,
+.lede,
+.card p,
+.print {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* The page itself has no scrollbar: the rail on the right edge is the
+   indicator, and it is not there until the page has moved. The boxes that do
+   scroll — code, the log, the cue sheet, the strip — keep a bar, drawn to
+   match the stock they sit on. */
+html {
+  scrollbar-width: none;
+}
+
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 ::-webkit-scrollbar {
@@ -134,6 +249,75 @@ html {
   background: var(--paper-2);
 }
 
+
+/* A strip of sprockets down the right edge, with one frame riding in it: where
+   the reader is, in the length of the page. It appears after the first scroll
+   and leaves when the page is back at the top, so nothing sits on the paper
+   while the reader is still on the first frame. */
+.scroll-rail {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 18px;
+  z-index: 55;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 240ms ease;
+  background-color: color-mix(in oklab, var(--paper) 70%, transparent);
+  border-left: 1px solid var(--rule-soft);
+  background-image: radial-gradient(3.5px 3px at 50% 50%, var(--rule) 96%, transparent 100%);
+  background-size: 18px 22px;
+}
+
+.scroll-rail.on {
+  opacity: 1;
+}
+
+.scroll-rail .thumb {
+  position: absolute;
+  left: 3px;
+  right: 3px;
+  top: 0;
+  min-height: 46px;
+  background: var(--amber);
+  border: 1px solid var(--amber-2);
+  cursor: grab;
+  pointer-events: auto;
+  touch-action: none;
+  will-change: transform;
+}
+
+.scroll-rail .thumb::before,
+.scroll-rail .thumb::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background-image: radial-gradient(1.7px 1.6px at 50% 50%, var(--paper) 96%, transparent 100%);
+  background-size: 6px 5px;
+  background-repeat: repeat-x;
+}
+
+.scroll-rail .thumb::before {
+  top: 4px;
+}
+
+.scroll-rail .thumb::after {
+  bottom: 4px;
+}
+
+.scroll-rail .thumb:active {
+  cursor: grabbing;
+}
+
+@media (width <= 860px) {
+  .scroll-rail {
+    display: none;
+  }
+}
+
 /* The grain and the vignette sit above the page, below the text, and take no
    clicks. Both are faint: the theme is a print, not a filter. */
 .grain,
@@ -145,8 +329,8 @@ html {
 }
 
 .grain {
-  opacity: 0.055;
-  mix-blend-mode: multiply;
+  opacity: var(--grain-opacity);
+  mix-blend-mode: var(--grain-blend);
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.82' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 160px 160px;
   animation: grain-shift 7s steps(6) infinite;
@@ -164,17 +348,7 @@ html {
 
 .vignette {
   background: radial-gradient(120% 92% at 50% 0%, transparent 46%, color-mix(in oklab, var(--ink) 22%, transparent) 100%);
-  opacity: 0.5;
-}
-
-@media (prefers-color-scheme: dark) {
-  .grain {
-    opacity: 0.07;
-    mix-blend-mode: screen;
-  }
-  .vignette {
-    opacity: 0.7;
-  }
+  opacity: var(--vignette-opacity);
 }
 
 /* The perforated edge of a strip. Two bands of holes, drawn as an ellipse
@@ -251,6 +425,45 @@ html {
 .nav a[aria-current="page"] {
   color: var(--amber);
   border-bottom-color: var(--amber);
+}
+
+/* The stock switch: a sun while the page is dark, a moon while it is light. */
+.theme-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 27px;
+  height: 27px;
+  padding: 0;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: transparent;
+  color: var(--ink-2);
+  font-family: var(--mono);
+  cursor: pointer;
+  transition: color 120ms ease, border-color 120ms ease;
+}
+
+.theme-toggle:hover {
+  color: var(--ink);
+  border-color: var(--amber);
+}
+
+.theme-toggle .icon {
+  width: 15px;
+  height: 15px;
+}
+
+.theme-toggle .sun {
+  display: none;
+}
+
+.theme-toggle[data-mode="dark"] .sun {
+  display: block;
+}
+
+.theme-toggle[data-mode="dark"] .moon {
+  display: none;
 }
 
 .nav .icon {
@@ -426,7 +639,6 @@ h1 {
   overflow-x: auto;
   overflow-y: hidden;
   scroll-snap-type: x proximity;
-  scrollbar-width: thin;
 }
 
 .strip-wrap::-webkit-scrollbar {
@@ -904,9 +1116,16 @@ h1 {
 @supports not selector(::-webkit-scrollbar) {
   .cues,
   .print,
-  .log textarea {
+  .log textarea,
+  .code pre {
     scrollbar-width: thin;
     scrollbar-color: color-mix(in oklab, var(--code-ink) 30%, var(--film)) var(--film-2);
+  }
+  .strip-wrap,
+  .out,
+  .prose .code pre {
+    scrollbar-width: thin;
+    scrollbar-color: var(--rule) transparent;
   }
 }
 
@@ -1032,6 +1251,24 @@ h1 {
   border: 1px solid color-mix(in oklab, var(--film) 55%, var(--rule));
   background: var(--code-bg);
   color: var(--code-ink);
+}
+
+.code pre::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+.code pre::-webkit-scrollbar-track {
+  background: var(--code-bg);
+}
+
+.code pre::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--code-ink) 24%, var(--code-bg));
+  border: 2px solid var(--code-bg);
+}
+
+.code pre::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in oklab, var(--code-ink) 40%, var(--code-bg));
 }
 
 .code pre {

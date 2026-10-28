@@ -166,6 +166,96 @@ function demo() {
   render(input.value);
 }
 
+function scrollRail() {
+  const rail = document.querySelector(".scroll-rail");
+  if (!rail) return;
+  const thumb = rail.querySelector(".thumb");
+  const doc = document.documentElement;
+
+  const size = () => {
+    const height = window.innerHeight;
+    const total = doc.scrollHeight;
+    const max = Math.max(total - height, 0);
+    const length = Math.max(46, (height / Math.max(total, 1)) * height);
+    return { height, total, max, length, travel: height - length };
+  };
+
+  const paint = () => {
+    const { max, length, travel } = size();
+    const y = window.scrollY;
+    // The rail is a sign that the page continues; at the top it would be
+    // furniture over a page that has not started.
+    rail.classList.toggle("on", y > 6 && max > 120);
+    if (max <= 0) return;
+    thumb.style.height = `${length}px`;
+    thumb.style.transform = `translateY(${(y / max) * travel}px)`;
+  };
+
+  let dragging = false;
+  let from = 0;
+  let scroll = 0;
+
+  thumb.addEventListener("pointerdown", (event) => {
+    dragging = true;
+    from = event.clientY;
+    scroll = window.scrollY;
+    thumb.setPointerCapture(event.pointerId);
+    event.preventDefault();
+  });
+
+  thumb.addEventListener("pointermove", (event) => {
+    if (!dragging) return;
+    const { max, travel } = size();
+    if (travel <= 0) return;
+    window.scrollTo(0, scroll + ((event.clientY - from) / travel) * max);
+  });
+
+  const stop = () => {
+    dragging = false;
+  };
+  thumb.addEventListener("pointerup", stop);
+  thumb.addEventListener("pointercancel", stop);
+
+  window.addEventListener("scroll", paint, { passive: true });
+  window.addEventListener("resize", paint);
+  paint();
+}
+
+function theme() {
+  const button = document.querySelector(".theme-toggle");
+  if (!button) return;
+  const root = document.documentElement;
+  const system = window.matchMedia("(prefers-color-scheme: dark)");
+
+  // What is on screen right now: an explicit choice, or what the system asked
+  // for when nobody has chosen.
+  const current = () => root.dataset.theme || (system.matches ? "dark" : "light");
+
+  const paint = () => {
+    const mode = current();
+    const label = mode === "dark" ? "Switch to light theme" : "Switch to dark theme";
+    button.dataset.mode = mode;
+    button.setAttribute("aria-label", label);
+    button.title = label;
+  };
+
+  button.addEventListener("click", () => {
+    const next = current() === "dark" ? "light" : "dark";
+    root.dataset.theme = next;
+    try {
+      localStorage.setItem("moonmedia-theme", next);
+    } catch {}
+    paint();
+  });
+
+  // A reader who has not chosen follows the system as it changes.
+  system.addEventListener("change", () => {
+    if (!root.dataset.theme) paint();
+  });
+
+  paint();
+}
+
 function copyButtons() {
   for (const block of document.querySelectorAll(".code")) {
     const pre = block.querySelector("pre");
@@ -371,6 +461,8 @@ function packet() {
   show(cells[0]);
 }
 
+scrollRail();
+theme();
 copyButtons();
 demo();
 guideContents();

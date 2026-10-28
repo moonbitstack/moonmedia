@@ -1,0 +1,11 @@
+// The glue the documentation homepage loads: the playlist package, compiled to
+// JavaScript, behind one function that takes text and returns a report.
+pkgtype(kind: "executable")
+
+supported_targets = "js"
+
+import {
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/encoding/utf8",
+  "moonbitstack/moonmedia/m3u8",
+}

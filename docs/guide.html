@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide — moonmedia</title>
+<meta name="description" content="Install moonmedia, read and write HLS playlists, walk an MP4, cut a movie into segments, read transport streams, ingest RTMP and write DASH manifests.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="perf" aria-hidden="true"></div>
+<header class="site-head">
+  <a class="brand" href="index.html">
+    <b>moonmedia</b>
+    <span>Reel 02 · The manual</span>
+  </a>
+  <nav class="nav" aria-label="Site">
+    <a href="guide.html" aria-current="page">Guide</a>
+    <a href="api.html">API</a>
+    <a href="anatomy.html">Anatomy</a>
+    <a class="github" href="https://github.com/moonbitstack/moonmedia">
+      <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      <span>GitHub</span>
+    </a>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap page-head">
+    <p class="reel">Reel 02 · The manual</p>
+    <h1>Guide</h1>
+    <p class="lede">
+      From one line in <code>moon.mod</code> to a package of segments, a
+      transport stream read back, and a publisher answered. Every block below
+      is code that ran; the output under it is what it printed.
+    </p>
+  </div>
+
+  <div class="wrap layout">
+    <nav class="toc" aria-label="Contents">
+      <p>Contents</p>
+      <a href="#install">Install</a>
+      <a href="#playlists">Playlists</a>
+      <a href="#boxes">Boxes</a>
+      <a href="#package">Cut a movie into HLS</a>
+      <a href="#transport">Transport streams</a>
+      <a href="#ingest">Ingest a publish stream</a>
+      <a href="#manifest">DASH manifests</a>
+      <a href="#limits">Where the library stops</a>
+    </nav>
+    <article class="prose">
+    <section id="install">
+      <h2>Install</h2>
+<p>One package holds the five formats and the packager. The formats are
+imported by their own paths, and the alias is the last part of the path.</p><div class="code"><span class="label">shell</span><pre>moon add moonbitstack/moonmedia</pre></div><p>The library depends on the standard library and nothing else. A program
+that reads playlists and never opens a container carries only the playlist
+code.</p>
+    </section>
+    <section id="playlists">
+      <h2>Playlists</h2>
+<p>A playlist is text, and <code>Playlist::parse</code> takes it as it arrived
+in a response. The result is either a master playlist or a media playlist.
+The segments of a media playlist carry the key and the initialisation section
+that were in force where they appear, so a caller looking for "what encrypts
+this segment" does not have to replay the file to find out.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let text =
+    #|#EXTM3U
+    #|#EXT-X-VERSION:7
+    #|#EXT-X-TARGETDURATION:6
+    #|#EXT-X-PLAYLIST-TYPE:VOD
+    #|#EXT-X-MAP:URI="init.mp4"
+    #|#EXTINF:6,
+    #|segment0.m4s
+    #|#EXTINF:4.004,
+    #|segment1.m4s
+    #|#EXT-X-ENDLIST
+  match @m3u8.Playlist::parse(text) {
+    MediaPlaylist(media) =&gt; {
+      println("target: " + media.target_duration.to_string() + " s")
+      for segment in media.segments {
+        println(segment.uri + " " + segment.duration.to_string())
+      }
+    }
+    MasterPlaylist(master) =&gt;
+      println("variants: " + master.variants.length().to_string())
+  }
+}</pre></div><div class="out">target: 6 s
+segment0.m4s 6
+segment1.m4s 4.004</div><p>Writing goes the other way: build the model, then encode it. An empty media
+playlist takes the target duration, because every other tag can be defaulted
+but that one cannot.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let media = @m3u8.MediaPlaylist::new(6)
+  media.version = Some(7)
+  media.playlist_type = Some(@m3u8.PlaylistType::Vod)
+  media.end_list = true
+  let init = @m3u8.InitSection::new("init.mp4")
+  for i = 0; i &lt; 2; i = i + 1 {
+    let segment = @m3u8.Segment::new("segment" + i.to_string() + ".m4s", 6.0)
+    segment.map = Some(init)
+    media.segments.push(segment)
+  }
+  println(media.encode())
+}</pre></div><div class="out">#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-TARGETDURATION:6
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-MAP:URI="init.mp4"
+#EXTINF:6,
+segment0.m4s
+#EXTINF:6,
+segment1.m4s
+#EXT-X-ENDLIST</div><div class="note"><b>Text in, text out, not the same text.</b> Durations are
+written in their shortest form — <code>6</code>, not <code>6.0</code> — and
+tags come out in the order RFC 8216 lists them, not the order the file
+happened to use. Reading a playlist and writing it back gives the same model,
+and a player sees the same thing; the bytes may differ.</div>
+    </section>
+    <section id="boxes">
+      <h2>Boxes</h2>
+<p>An MP4 is a tree of boxes. <code>Mp4::parse</code> reads the tree, and a box
+the package has no name for keeps its payload and its header form, so writing
+the file back gives the file that was read.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let samples : Array[@mp4.SampleData] = [
+    {
+      data: Bytes::from_array([b'\x00', b'\x00', b'\x00', b'\x01', b'\x65']),
+      duration: 1024L,
+      composition_offset: 0L,
+      sync: true,
+    },
+    {
+      data: Bytes::from_array([b'\x00', b'\x00', b'\x00', b'\x01', b'\x41']),
+      duration: 1024L,
+      composition_offset: 512L,
+      sync: false,
+    },
+  ]
+  let fragment = @mp4.MovieFragment::new(1, [
+    { track_id: 1, base_decode_time: 0L, samples },
+  ])
+  let data = fragment.encode()
+  let file = @mp4.Mp4::parse(data[:])
+  for box in file.boxes {
+    println(box.type_ + " " + box.byte_length().to_string() + " bytes")
+  }
+  let read = file.fragments()[0]
+  println("fragment " + read.sequence.to_string() + ", " + read.start.to_string() +
+    ".." + read.end.to_string())
+  for run in read.runs {
+    for sample in run.samples {
+      println("sample " + sample.size.to_string() + " bytes at " +
+        sample.offset.to_string() + ", key frame: " + sample.sync.to_string())
+    }
+  }
+  println("round trip: " + (file.encode() == data).to_string())
+}</pre></div><div class="out">moof 120 bytes
+mdat 18 bytes
+fragment 1, 0..138
+sample 5 bytes at 128, key frame: true
+sample 5 bytes at 133, key frame: false
+round trip: true</div><p>The offsets in a run are absolute, measured from the start of the bytes that
+were parsed; <code>fragment.start</code> and <code>fragment.end</code> are the
+part of that buffer the fragment occupies, media data included. A caller
+serving byte ranges needs both.</p>
+<p><code>tracks()</code> reads the sample table when a file has one, and the
+fragments when it has those instead — a file written by a packager and a file
+written by an encoder both come back as tracks with samples, and the caller
+does not have to know which kind of file it opened.</p>
+    </section>
+    <section id="package">
+      <h2>Cut a movie into HLS</h2>
+<p><code>Packager</code> takes a parsed movie and returns what a player asks
+for: one initialisation section, then one fragment per key frame interval. The
+audio that falls in an interval travels with the video that starts it.</p>
+<p>The bytes below come from a file the caller already has. This is the one
+snippet on this page that is not a test: a movie is not something a test can
+invent, so the step that reads one is left out.</p><!-- nocheck -->
+<div class="code"><span class="label">moonbit</span><pre>// `movie` is a file's bytes, from wherever the caller got them.
+let file = @mp4.Mp4::parse(movie)
+let packager = @moonmedia.Packager::new(file, target_duration=0.6)
+let init = packager.init_segment()
+for i, segment in packager.segments() {
+  println("segment" + i.to_string() + ".m4s " + segment.duration.to_string() +
+    " s " + segment.data.length().to_string() + " bytes")
+}
+println(packager.media_playlist().encode())
+println(packager.master_playlist(uri="index.m3u8").encode())</pre></div><div class="out">init 1137 bytes
+segment0.m4s 0.6 s 8755 bytes
+segment1.m4s 0.6 s 8800 bytes
+#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-TARGETDURATION:1
+#EXT-X-PLAYLIST-TYPE:VOD
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-MAP:URI="init.mp4"
+#EXTINF:0.6,
+segment0.m4s
+#EXTINF:0.6,
+segment1.m4s
+#EXT-X-ENDLIST
+
+#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-INDEPENDENT-SEGMENTS
+#EXT-X-STREAM-INF:BANDWIDTH=117033,CODECS="avc1.42c00a,mp4a.40.2",RESOLUTION=64x64
+index.m3u8</div><p>Each segment is a movie fragment of its own: a <code>moof</code> and the
+<code>mdat</code> it points at, so a player can fetch one without the others.
+The initialisation section is <code>ftyp</code> and <code>moov</code>, with
+the sample tables stripped and the codec description kept.</p>
+<p>The target duration is a hint, not a rule: the packager cuts where the
+key frames are, and a segment can be shorter or longer than the target. The
+playlist's own <code>EXT-X-TARGETDURATION</code> is the longest segment that
+came out, rounded up.</p>
+    </section>
+    <section id="transport">
+      <h2>Transport streams</h2>
+<p>A transport stream is a sequence of 188-byte packets. Some carry tables
+that say which programme is on which PID and what each programme is made of;
+the rest carry pieces of elementary streams, timed by a clock that rides in
+the adaptation field of one of them.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let pat = @ts.Pat::new(transport_stream=1, programs=[@ts.Program::new(1, 0x1000)])
+  let packet = pat.section().packets(@ts.pat_pid)[0]
+  let stream = packet.encode()
+  println("packet " + stream.length().to_string() + " bytes")
+  let packets = @ts.parse(stream[:])
+  let table = @ts.sections(packets, @ts.pat_pid)[0]
+  let read = @ts.Pat::of(table)
+  println("programme " + read.programs[0].number.to_string() +
+    " on pid " + read.programs[0].pid.to_string())
+  println("intact: " + table.is_intact().to_string())
+  let pes = @ts.Pes::new(0xE0, Bytes::from_array([b'\x00', b'\x00', b'\x00', b'\x01', b'\x09']),
+    pts=90000L)
+  println("pts " + pes.pts().unwrap().to_string())
+}</pre></div><div class="out">packet 188 bytes
+programme 1 on pid 4096
+intact: true
+pts 90000</div><p>Reading a whole stream is one call, and then the tables and the elementary
+streams are questions asked of the packets: <code>sections</code> puts a PID's
+payloads back into tables, <code>pes_packets</code> puts them back into frames.
+The packets themselves are kept as they arrived, so writing them out again is
+byte for byte the stream that came in.</p>
+<div class="note"><b>Checksums are checked, not trusted.</b>
+<code>Section::is_intact</code> recomputes the CRC-32. A table with a bit error
+in it is still parsed — a caller may want to see what it said — but it can tell
+that the table is damaged before acting on it.</div>
+    </section>
+    <section id="ingest">
+      <h2>Ingest a publish stream</h2>
+<p>RTMP is a conversation with an order to it: a handshake, a chunk size, the
+commands that set up a stream, then media. <code>Session</code> is that
+conversation as a state machine. Feed it the bytes a connection read; it
+returns the bytes to write back.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let session = @rtmp.Session::new()
+  let answer = session.push(@rtmp.client_start(0)[:])
+  let _ = session.push(@rtmp.client_finish(answer[0][:])[:])
+  let writer = @rtmp.ChunkWriter::new()
+  let _ = session.push(writer.write(@rtmp.set_chunk_size(4096))[:])
+  writer.chunk_size = 4096
+  let connect = @rtmp.Message::new(
+    @rtmp.msg_command,
+    0,
+    @rtmp.encode_all([
+      @rtmp.Amf0::String("connect"),
+      @rtmp.Amf0::Number(1.0),
+      @rtmp.Amf0::Object([("app", @rtmp.Amf0::String("live"))]),
+    ]),
+  )
+  let replies = session.push(writer.write(connect)[:])
+  println("replies " + replies.length().to_string() + ", app " + session.app())
+  let publish = @rtmp.Message::new(
+    @rtmp.msg_command,
+    1,
+    @rtmp.encode_all([
+      @rtmp.Amf0::String("publish"),
+      @rtmp.Amf0::Number(2.0),
+      @rtmp.Amf0::Null,
+      @rtmp.Amf0::String("camera"),
+      @rtmp.Amf0::String("live"),
+    ]),
+  )
+  let _ = session.push(writer.write(publish)[:])
+  println("stream " + session.stream_name())
+  let video = @rtmp.Message::new(@rtmp.msg_video, 1,
+    Bytes::from_array([b'\x17', b'\x00', b'\x00']))
+  let _ = session.push(writer.write(video)[:])
+  println("media " + session.take_media().length().to_string())
+}</pre></div><div class="out">replies 4, app live
+stream camera
+media 1</div><p>What comes back from <code>push</code> is what the peer is owed right now:
+the handshake answer, a window acknowledgement size, the reply to each
+command. <code>take_media</code> empties the queue of audio and video messages
+in the order they arrived, each with its timestamp, and
+<code>metadata</code> holds the properties from the publisher's
+<code>onMetaData</code>.</p>
+<p>A session that is only halfway through a message keeps the pieces and waits
+for the rest, so a caller can hand it whatever a socket returned — one byte or
+sixty kilobytes.</p>
+    </section>
+    <section id="manifest">
+      <h2>DASH manifests</h2>
+<p>An MPD is XML. The model is built, encoded, and parsed back; XML never
+reaches the caller, and a manifest written here carries the attributes the
+specification requires even when the model left them out.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let manifest = @mpd.Manifest::new(kind=@mpd.Kind::Static)
+  manifest.min_buffer_time = Some(2.0)
+  manifest.duration = Some(8.0)
+  let period = @mpd.Period::new(id="1", start=0.0)
+  let video = @mpd.AdaptationSet::new(content_type="video", mime_type="video/mp4")
+  let template = @mpd.Template::new()
+  template.duration = Some(4000L)
+  template.timescale = Some(1000L)
+  template.media = Some("segment-$Number$.m4s")
+  video.template = Some(template)
+  video.representations.push(@mpd.Representation::new("v0", bandwidth=800_000))
+  period.adaptations.push(video)
+  manifest.periods.push(period)
+  println(manifest.encode())
+  println("read back: " +
+    @mpd.Manifest::parse(manifest.encode()).periods.length().to_string() + " period")
+}</pre></div><div class="out">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;MPD xmlns="urn:mpeg:dash:schema:mpd:2011" type="static" profiles="urn:mpeg:dash:profile:isoff-live:2011" minBufferTime="PT2S" mediaPresentationDuration="PT8S"&gt;
+  &lt;Period id="1" start="PT0S"&gt;
+    &lt;AdaptationSet contentType="video" mimeType="video/mp4"&gt;
+      &lt;SegmentTemplate timescale="1000" duration="4000" media="segment-$Number$.m4s"/&gt;
+      &lt;Representation id="v0" bandwidth="800000"/&gt;
+    &lt;/AdaptationSet&gt;
+  &lt;/Period&gt;
+&lt;/MPD&gt;
+read back: 1 period</div><p>Durations are handled as the format writes them: <code>PT2S</code> reads as
+two seconds, <code>PT1H2M3.5S</code> as an hour, two minutes and three and a
+half seconds, and a value that is not a duration is an error rather than a
+silent zero.</p>
+    </section>
+    <section id="limits">
+      <h2>Where the library stops</h2>
+<p>The library reads and writes formats. It does not open sockets, read files,
+or decode anything.</p>
+<ul>
+  <li><b>No I/O.</b> A playlist arrives as bytes and leaves as bytes; serving
+  them is the caller's job, whether that is a range request or a file on
+  disk.</li>
+  <li><b>No codecs.</b> Samples are carried, not inspected. The codec string
+  from a sample description is passed through, and an H.264 access unit is
+  bytes like any other.</li>
+  <li><b>No live window.</b> <code>Packager</code> cuts a file that has an
+  end. A rolling playlist for a live stream is a media playlist the caller
+  maintains, dropping the segment that fell out and adding the one that just
+  finished — the playlist type writes it, and the low-latency tags are read
+  and written the same way.</li>
+</ul>
+<p>Next: the reference lists every function and type, and the
+<a href="anatomy.html">anatomy</a> takes one second of video apart three
+ways.</p>
+    </section>
+    </article>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="perf" aria-hidden="true"></div>
+  <div class="inner">
+    <div>
+      <a class="brand" href="index.html"><b>moonmedia</b> <span>for MoonBit</span></a>
+      <p>Apache-2.0 · No sockets, no files</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="index.html">Homepage</a>
+      <a href="api.html">API</a>
+      <a href="anatomy.html">Anatomy</a>
+      <a href="https://github.com/moonbitstack/moonmedia">Source</a>
+      <a href="https://mooncakes.io/docs/moonbitstack/moonmedia">mooncakes</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

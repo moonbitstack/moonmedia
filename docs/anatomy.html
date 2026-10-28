@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Anatomy of a segment — moonmedia</title>
+<meta name="description" content="One second of video taken apart: where the cuts fall, what an MP4 fragment is made of, and what fits in a 188-byte transport packet.">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,700;1,6..96,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="grain" aria-hidden="true"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<div class="perf" aria-hidden="true"></div>
+<header class="site-head">
+  <a class="brand" href="index.html">
+    <b>moonmedia</b>
+    <span>Reel 03 · The cutting room</span>
+  </a>
+  <nav class="nav" aria-label="Site">
+    <a href="guide.html">Guide</a>
+    <a href="api.html">API</a>
+    <a href="anatomy.html" aria-current="page">Anatomy</a>
+    <a class="github" href="https://github.com/moonbitstack/moonmedia">
+      <svg class="icon" viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8Z"/></svg>
+      <span>GitHub</span>
+    </a>
+  </nav>
+</header>
+
+<main>
+  <div class="wrap page-head">
+    <p class="reel">Reel 03 · The cutting room</p>
+    <h1>Anatomy</h1>
+    <p class="lede">
+      A one-second clip, cut into two segments and pushed through a transport
+      stream. Every number here was read from the bytes this library wrote:
+      twelve frames, two fragments, one packet.
+    </p>
+  </div>
+
+  <div class="wrap" style="padding-top:34px">
+    <div class="stage" data-tabs>
+      <div class="tabs" role="tablist" aria-label="Views">
+        <button class="tab" type="button" role="tab" data-tab="cuts">01 · The cut</button>
+        <button class="tab" type="button" role="tab" data-tab="fragment">02 · The fragment</button>
+        <button class="tab" type="button" role="tab" data-tab="packet">03 · The packet</button>
+      </div>
+
+      <div class="panel" data-panel="cuts">
+        <h3>Where the cuts fall</h3>
+        <p>A decoder can start at a key frame and nowhere else, so the packager
+        cuts there. The target duration is what it aims for; the key frames are
+        what decides. Below are the twelve frames of the clip, and the two
+        segments that came out.</p>
+
+        <div class="frames" aria-hidden="true">
+          <span class="reel-frame key" data-cut="0" title="frame 0"></span>
+          <span class="reel-frame" data-cut="0" title="frame 1"></span>
+          <span class="reel-frame" data-cut="0" title="frame 2"></span>
+          <span class="reel-frame" data-cut="0" title="frame 3"></span>
+          <span class="reel-frame" data-cut="0" title="frame 4"></span>
+          <span class="reel-frame" data-cut="0" title="frame 5"></span>
+          <span class="reel-frame key" data-cut="1" title="frame 6"></span>
+          <span class="reel-frame" data-cut="1" title="frame 7"></span>
+          <span class="reel-frame" data-cut="1" title="frame 8"></span>
+          <span class="reel-frame" data-cut="1" title="frame 9"></span>
+          <span class="reel-frame" data-cut="1" title="frame 10"></span>
+          <span class="reel-frame" data-cut="1" title="frame 11"></span>
+        </div>
+
+        <div class="cuts">
+          <button class="cut" type="button" data-cut="0" aria-pressed="true"
+            data-start="0.00 s" data-duration="0.60 s" data-size="8,755 bytes"
+            data-video="6" data-audio="5">
+            <b>segment 0</b><span>0.00 – 0.60 s · 8,755 bytes</span>
+          </button>
+          <button class="cut" type="button" data-cut="1" aria-pressed="false"
+            data-start="0.60 s" data-duration="0.60 s" data-size="8,800 bytes"
+            data-video="6" data-audio="6">
+            <b>segment 1</b><span>0.60 – 1.20 s · 8,800 bytes</span>
+          </button>
+        </div>
+
+        <dl class="readout" id="cut-readout">
+          <div><dt>starts at</dt><dd data-field="start">0.00 s</dd></div>
+          <div><dt>duration</dt><dd data-field="duration">0.60 s</dd></div>
+          <div><dt>size</dt><dd data-field="size">8,755 bytes</dd></div>
+          <div><dt>video samples</dt><dd data-field="video">6</dd></div>
+          <div><dt>audio samples</dt><dd data-field="audio">5</dd></div>
+        </dl>
+
+        <p style="margin-top:18px">The playlist that names them starts with the
+        initialisation section a player fetches once, then one line per segment:</p>
+        <div class="code"><span class="label">playlist</span><pre>#EXTM3U
+#EXT-X-VERSION:7
+#EXT-X-TARGETDURATION:1
+#EXT-X-MAP:URI="init.mp4"
+#EXTINF:0.6,
+segment0.m4s
+#EXTINF:0.6,
+segment1.m4s</pre></div>
+      </div>
+
+      <div class="panel" data-panel="fragment" hidden>
+        <h3>What a segment is made of</h3>
+        <p>Each segment is a movie fragment: a <code>moof</code> that says where
+        every sample is and when to show it, then the <code>mdat</code> that holds
+        them. Pick a box to see what it does.</p>
+
+        <div class="tree">
+          <div class="box-row kind-moof" data-depth="0" data-start="0" data-size="328" data-type="moof" data-note="movie fragment header" tabindex="0"><span class="name"><i></i>moof</span><span class="size">328 B</span></div>
+          <div class="box-row kind-mfhd" data-depth="1" data-start="8" data-size="16" data-type="mfhd" data-note="sequence number 1" tabindex="0"><span class="name"><i></i>mfhd</span><span class="size">16 B</span></div>
+          <div class="box-row kind-traf" data-depth="1" data-start="24" data-size="160" data-type="traf" data-note="the video track" tabindex="0"><span class="name"><i></i>traf</span><span class="size">160 B</span></div>
+          <div class="box-row kind-tfhd" data-depth="2" data-start="32" data-size="16" data-type="tfhd" data-note="track 1, base data offset is the start of the moof" tabindex="0"><span class="name"><i></i>tfhd</span><span class="size">16 B</span></div>
+          <div class="box-row kind-tfdt" data-depth="2" data-start="48" data-size="20" data-type="tfdt" data-note="first decode time 0" tabindex="0"><span class="name"><i></i>tfdt</span><span class="size">20 B</span></div>
+          <div class="box-row kind-trun" data-depth="2" data-start="68" data-size="116" data-type="trun" data-note="6 samples, data offset 328" tabindex="0"><span class="name"><i></i>trun</span><span class="size">116 B</span></div>
+          <div class="box-row kind-traf" data-depth="1" data-start="184" data-size="144" data-type="traf" data-note="the audio track" tabindex="0"><span class="name"><i></i>traf</span><span class="size">144 B</span></div>
+          <div class="box-row kind-tfhd" data-depth="2" data-start="192" data-size="16" data-type="tfhd" data-note="track 2" tabindex="0"><span class="name"><i></i>tfhd</span><span class="size">16 B</span></div>
+          <div class="box-row kind-tfdt" data-depth="2" data-start="208" data-size="20" data-type="tfdt" data-note="first decode time 0" tabindex="0"><span class="name"><i></i>tfdt</span><span class="size">20 B</span></div>
+          <div class="box-row kind-trun" data-depth="2" data-start="228" data-size="100" data-type="trun" data-note="6 samples, data offset 8408" tabindex="0"><span class="name"><i></i>trun</span><span class="size">100 B</span></div>
+          <div class="box-row kind-mdat" data-depth="0" data-start="328" data-size="8427" data-type="mdat" data-note="the samples themselves" tabindex="0"><span class="name"><i></i>mdat</span><span class="size">8,427 B</span></div>
+        </div>
+
+        <div class="ruler" aria-hidden="true"><div class="base"></div><div class="span"></div></div>
+        <p class="ruler-note">0 to 8,755 bytes · the span is the selected box</p>
+        <div class="readout" id="box-readout">
+          <div><dt>box</dt><dd data-field="type">moof</dd></div>
+          <div><dt>offset</dt><dd data-field="offset">0</dd></div>
+          <div><dt>size</dt><dd data-field="size">328 bytes</dd></div>
+          <div style="grid-column: span 2"><dt>what it holds</dt><dd data-field="note">movie fragment header</dd></div>
+        </div>
+
+        <p style="margin-top:18px">The <code>trun</code> is the part a player
+        actually needs: a count of samples, the offset where the first one starts,
+        and per sample a duration, a size, the flags that mark a key frame, and a
+        composition offset for frames that are shown out of decode order.</p>
+      </div>
+
+      <div class="panel" data-panel="packet" hidden>
+        <h3>188 bytes</h3>
+        <p>A transport packet is always 188 bytes: four of header, then either an
+        adaptation field, a payload, or both. This one carries the clock. Hover a
+        byte to see what it is.</p>
+
+        <div class="bytes">
+          <span class="f-sync" data-byte="0" data-field="sync" title="byte 0 · 0x47">47</span>
+          <span class="f-pid" data-byte="1" data-field="pid" title="byte 1 · 0x41">41</span>
+          <span class="f-pid" data-byte="2" data-field="pid" title="byte 2 · 0x00">00</span>
+          <span class="f-flags" data-byte="3" data-field="flags" title="byte 3 · 0x30">30</span>
+          <span class="f-af" data-byte="4" data-field="af" title="byte 4 · 0x07">07</span>
+          <span class="f-af" data-byte="5" data-field="af" title="byte 5 · 0x50">50</span>
+          <span class="f-pcr" data-byte="6" data-field="pcr" title="byte 6 · 0x00">00</span>
+          <span class="f-pcr" data-byte="7" data-field="pcr" title="byte 7 · 0x00">00</span>
+          <span class="f-pcr" data-byte="8" data-field="pcr" title="byte 8 · 0x91">91</span>
+          <span class="f-pcr" data-byte="9" data-field="pcr" title="byte 9 · 0x8c">8c</span>
+          <span class="f-pcr" data-byte="10" data-field="pcr" title="byte 10 · 0x7e">7e</span>
+          <span class="f-pcr" data-byte="11" data-field="pcr" title="byte 11 · 0x00">00</span>
+          <span class="f-payload" data-byte="12" data-field="payload" title="byte 12 · 0x00">00</span>
+          <span class="f-payload" data-byte="13" data-field="payload" title="byte 13 · 0x00">00</span>
+          <span class="f-payload" data-byte="14" data-field="payload" title="byte 14 · 0x01">01</span>
+          <span class="f-payload" data-byte="15" data-field="payload" title="byte 15 · 0xe0">e0</span>
+          <span class="f-payload" data-byte="16" data-field="payload" title="byte 16 · 0x00">00</span>
+          <span class="f-payload" data-byte="17" data-field="payload" title="byte 17 · 0x00">00</span>
+          <span class="f-payload" data-byte="18" data-field="payload" title="byte 18 · 0x80">80</span>
+          <span class="f-payload" data-byte="19" data-field="payload" title="byte 19 · 0x80">80</span>
+          <span class="f-payload" data-byte="20" data-field="payload" title="byte 20 · 0x05">05</span>
+          <span class="f-payload" data-byte="21" data-field="payload" title="byte 21 · 0x21">21</span>
+          <span class="f-payload" data-byte="22" data-field="payload" title="byte 22 · 0x00">00</span>
+          <span class="f-payload" data-byte="23" data-field="payload" title="byte 23 · 0x09">09</span>
+          <span class="f-payload" data-byte="24" data-field="payload" title="byte 24 · 0x32">32</span>
+          <span class="f-payload" data-byte="25" data-field="payload" title="byte 25 · 0x61">61</span>
+          <span class="f-payload" data-byte="26" data-field="payload" title="byte 26 · 0x00">00</span>
+          <span class="f-payload" data-byte="27" data-field="payload" title="byte 27 · 0x00">00</span>
+          <span class="f-payload" data-byte="28" data-field="payload" title="byte 28 · 0x00">00</span>
+          <span class="f-payload" data-byte="29" data-field="payload" title="byte 29 · 0x01">01</span>
+          <span class="f-payload" data-byte="30" data-field="payload" title="byte 30 · 0x09">09</span>
+          <span class="f-payload" data-byte="31" data-field="payload" title="byte 31 · 0xf0">f0</span>
+          <span class="f-payload" data-byte="32" data-field="payload" title="byte 32 · 0x00">00</span>
+          <span class="f-payload" data-byte="33" data-field="payload" title="byte 33 · 0x00">00</span>
+          <span class="f-payload" data-byte="34" data-field="payload" title="byte 34 · 0x00">00</span>
+          <span class="f-payload" data-byte="35" data-field="payload" title="byte 35 · 0x01">01</span>
+          <span class="f-payload" data-byte="36" data-field="payload" title="byte 36 · 0x67">67</span>
+          <span class="f-payload" data-byte="37" data-field="payload" title="byte 37 · 0x42">42</span>
+          <span class="f-payload" data-byte="38" data-field="payload" title="byte 38 · 0xd0">d0</span>
+          <span class="f-payload" data-byte="39" data-field="payload" title="byte 39 · 0x0b">0b</span>
+          <span class="f-payload" data-byte="40" data-field="payload" title="byte 40 · 0xda">da</span>
+          <span class="f-payload" data-byte="41" data-field="payload" title="byte 41 · 0x25">25</span>
+          <span class="f-payload" data-byte="42" data-field="payload" title="byte 42 · 0xb0">b0</span>
+          <span class="f-payload" data-byte="43" data-field="payload" title="byte 43 · 0x11">11</span>
+          <span class="f-payload" data-byte="44" data-field="payload" title="byte 44 · 0x00">00</span>
+          <span class="f-payload" data-byte="45" data-field="payload" title="byte 45 · 0x00">00</span>
+          <span class="f-payload" data-byte="46" data-field="payload" title="byte 46 · 0x03">03</span>
+          <span class="f-payload" data-byte="47" data-field="payload" title="byte 47 · 0x00">00</span>
+          <span class="f-payload" data-byte="48" data-field="payload" title="byte 48 · 0x01">01</span>
+          <span class="f-payload" data-byte="49" data-field="payload" title="byte 49 · 0x00">00</span>
+          <span class="f-payload" data-byte="50" data-field="payload" title="byte 50 · 0x00">00</span>
+          <span class="f-payload" data-byte="51" data-field="payload" title="byte 51 · 0x03">03</span>
+          <span class="f-payload" data-byte="52" data-field="payload" title="byte 52 · 0x00">00</span>
+          <span class="f-payload" data-byte="53" data-field="payload" title="byte 53 · 0x10">10</span>
+          <span class="f-payload" data-byte="54" data-field="payload" title="byte 54 · 0x0f">0f</span>
+          <span class="f-payload" data-byte="55" data-field="payload" title="byte 55 · 0x12">12</span>
+          <span class="f-payload" data-byte="56" data-field="payload" title="byte 56 · 0x26">26</span>
+          <span class="f-payload" data-byte="57" data-field="payload" title="byte 57 · 0xa0">a0</span>
+          <span class="f-payload" data-byte="58" data-field="payload" title="byte 58 · 0x00">00</span>
+          <span class="f-payload" data-byte="59" data-field="payload" title="byte 59 · 0x00">00</span>
+          <span class="f-payload" data-byte="60" data-field="payload" title="byte 60 · 0x00">00</span>
+          <span class="f-payload" data-byte="61" data-field="payload" title="byte 61 · 0x01">01</span>
+          <span class="f-payload" data-byte="62" data-field="payload" title="byte 62 · 0x68">68</span>
+          <span class="f-payload" data-byte="63" data-field="payload" title="byte 63 · 0xce">ce</span>
+          <span class="f-payload" data-byte="64" data-field="payload" title="byte 64 · 0x3c">3c</span>
+          <span class="f-payload" data-byte="65" data-field="payload" title="byte 65 · 0x80">80</span>
+          <span class="f-payload" data-byte="66" data-field="payload" title="byte 66 · 0x00">00</span>
+          <span class="f-payload" data-byte="67" data-field="payload" title="byte 67 · 0x00">00</span>
+          <span class="f-payload" data-byte="68" data-field="payload" title="byte 68 · 0x01">01</span>
+          <span class="f-payload" data-byte="69" data-field="payload" title="byte 69 · 0x06">06</span>
+          <span class="f-payload" data-byte="70" data-field="payload" title="byte 70 · 0x05">05</span>
+          <span class="f-payload" data-byte="71" data-field="payload" title="byte 71 · 0xff">ff</span>
+          <span class="f-payload" data-byte="72" data-field="payload" title="byte 72 · 0xff">ff</span>
+          <span class="f-payload" data-byte="73" data-field="payload" title="byte 73 · 0x5b">5b</span>
+          <span class="f-payload" data-byte="74" data-field="payload" title="byte 74 · 0xdc">dc</span>
+          <span class="f-payload" data-byte="75" data-field="payload" title="byte 75 · 0x45">45</span>
+          <span class="f-payload" data-byte="76" data-field="payload" title="byte 76 · 0xe9">e9</span>
+          <span class="f-payload" data-byte="77" data-field="payload" title="byte 77 · 0xbd">bd</span>
+          <span class="f-payload" data-byte="78" data-field="payload" title="byte 78 · 0xe6">e6</span>
+          <span class="f-payload" data-byte="79" data-field="payload" title="byte 79 · 0xd9">d9</span>
+          <span class="f-payload" data-byte="80" data-field="payload" title="byte 80 · 0x48">48</span>
+          <span class="f-payload" data-byte="81" data-field="payload" title="byte 81 · 0xb7">b7</span>
+          <span class="f-payload" data-byte="82" data-field="payload" title="byte 82 · 0x96">96</span>
+          <span class="f-payload" data-byte="83" data-field="payload" title="byte 83 · 0x2c">2c</span>
+          <span class="f-payload" data-byte="84" data-field="payload" title="byte 84 · 0xd8">d8</span>
+          <span class="f-payload" data-byte="85" data-field="payload" title="byte 85 · 0x20">20</span>
+          <span class="f-payload" data-byte="86" data-field="payload" title="byte 86 · 0xd9">d9</span>
+          <span class="f-payload" data-byte="87" data-field="payload" title="byte 87 · 0x23">23</span>
+          <span class="f-payload" data-byte="88" data-field="payload" title="byte 88 · 0xee">ee</span>
+          <span class="f-payload" data-byte="89" data-field="payload" title="byte 89 · 0xef">ef</span>
+          <span class="f-payload" data-byte="90" data-field="payload" title="byte 90 · 0x78">78</span>
+          <span class="f-payload" data-byte="91" data-field="payload" title="byte 91 · 0x32">32</span>
+          <span class="f-payload" data-byte="92" data-field="payload" title="byte 92 · 0x36">36</span>
+          <span class="f-payload" data-byte="93" data-field="payload" title="byte 93 · 0x34">34</span>
+          <span class="f-payload" data-byte="94" data-field="payload" title="byte 94 · 0x20">20</span>
+          <span class="f-payload" data-byte="95" data-field="payload" title="byte 95 · 0x2d">2d</span>
+          <span class="f-payload" data-byte="96" data-field="payload" title="byte 96 · 0x20">20</span>
+          <span class="f-payload" data-byte="97" data-field="payload" title="byte 97 · 0x63">63</span>
+          <span class="f-payload" data-byte="98" data-field="payload" title="byte 98 · 0x6f">6f</span>
+          <span class="f-payload" data-byte="99" data-field="payload" title="byte 99 · 0x72">72</span>
+          <span class="f-payload" data-byte="100" data-field="payload" title="byte 100 · 0x65">65</span>
+          <span class="f-payload" data-byte="101" data-field="payload" title="byte 101 · 0x20">20</span>
+          <span class="f-payload" data-byte="102" data-field="payload" title="byte 102 · 0x31">31</span>
+          <span class="f-payload" data-byte="103" data-field="payload" title="byte 103 · 0x36">36</span>
+          <span class="f-payload" data-byte="104" data-field="payload" title="byte 104 · 0x35">35</span>
+          <span class="f-payload" data-byte="105" data-field="payload" title="byte 105 · 0x20">20</span>
+          <span class="f-payload" data-byte="106" data-field="payload" title="byte 106 · 0x72">72</span>
+          <span class="f-payload" data-byte="107" data-field="payload" title="byte 107 · 0x33">33</span>
+          <span class="f-payload" data-byte="108" data-field="payload" title="byte 108 · 0x32">32</span>
+          <span class="f-payload" data-byte="109" data-field="payload" title="byte 109 · 0x32">32</span>
+          <span class="f-payload" data-byte="110" data-field="payload" title="byte 110 · 0x33">33</span>
+          <span class="f-payload" data-byte="111" data-field="payload" title="byte 111 · 0x20">20</span>
+          <span class="f-payload" data-byte="112" data-field="payload" title="byte 112 · 0x30">30</span>
+          <span class="f-payload" data-byte="113" data-field="payload" title="byte 113 · 0x34">34</span>
+          <span class="f-payload" data-byte="114" data-field="payload" title="byte 114 · 0x38">38</span>
+          <span class="f-payload" data-byte="115" data-field="payload" title="byte 115 · 0x30">30</span>
+          <span class="f-payload" data-byte="116" data-field="payload" title="byte 116 · 0x63">63</span>
+          <span class="f-payload" data-byte="117" data-field="payload" title="byte 117 · 0x62">62</span>
+          <span class="f-payload" data-byte="118" data-field="payload" title="byte 118 · 0x30">30</span>
+          <span class="f-payload" data-byte="119" data-field="payload" title="byte 119 · 0x20">20</span>
+          <span class="f-payload" data-byte="120" data-field="payload" title="byte 120 · 0x2d">2d</span>
+          <span class="f-payload" data-byte="121" data-field="payload" title="byte 121 · 0x20">20</span>
+          <span class="f-payload" data-byte="122" data-field="payload" title="byte 122 · 0x48">48</span>
+          <span class="f-payload" data-byte="123" data-field="payload" title="byte 123 · 0x2e">2e</span>
+          <span class="f-payload" data-byte="124" data-field="payload" title="byte 124 · 0x32">32</span>
+          <span class="f-payload" data-byte="125" data-field="payload" title="byte 125 · 0x36">36</span>
+          <span class="f-payload" data-byte="126" data-field="payload" title="byte 126 · 0x34">34</span>
+          <span class="f-payload" data-byte="127" data-field="payload" title="byte 127 · 0x2f">2f</span>
+          <span class="f-payload" data-byte="128" data-field="payload" title="byte 128 · 0x4d">4d</span>
+          <span class="f-payload" data-byte="129" data-field="payload" title="byte 129 · 0x50">50</span>
+          <span class="f-payload" data-byte="130" data-field="payload" title="byte 130 · 0x45">45</span>
+          <span class="f-payload" data-byte="131" data-field="payload" title="byte 131 · 0x47">47</span>
+          <span class="f-payload" data-byte="132" data-field="payload" title="byte 132 · 0x2d">2d</span>
+          <span class="f-payload" data-byte="133" data-field="payload" title="byte 133 · 0x34">34</span>
+          <span class="f-payload" data-byte="134" data-field="payload" title="byte 134 · 0x20">20</span>
+          <span class="f-payload" data-byte="135" data-field="payload" title="byte 135 · 0x41">41</span>
+          <span class="f-payload" data-byte="136" data-field="payload" title="byte 136 · 0x56">56</span>
+          <span class="f-payload" data-byte="137" data-field="payload" title="byte 137 · 0x43">43</span>
+          <span class="f-payload" data-byte="138" data-field="payload" title="byte 138 · 0x20">20</span>
+          <span class="f-payload" data-byte="139" data-field="payload" title="byte 139 · 0x63">63</span>
+          <span class="f-payload" data-byte="140" data-field="payload" title="byte 140 · 0x6f">6f</span>
+          <span class="f-payload" data-byte="141" data-field="payload" title="byte 141 · 0x64">64</span>
+          <span class="f-payload" data-byte="142" data-field="payload" title="byte 142 · 0x65">65</span>
+          <span class="f-payload" data-byte="143" data-field="payload" title="byte 143 · 0x63">63</span>
+          <span class="f-payload" data-byte="144" data-field="payload" title="byte 144 · 0x20">20</span>
+          <span class="f-payload" data-byte="145" data-field="payload" title="byte 145 · 0x2d">2d</span>
+          <span class="f-payload" data-byte="146" data-field="payload" title="byte 146 · 0x20">20</span>
+          <span class="f-payload" data-byte="147" data-field="payload" title="byte 147 · 0x43">43</span>
+          <span class="f-payload" data-byte="148" data-field="payload" title="byte 148 · 0x6f">6f</span>
+          <span class="f-payload" data-byte="149" data-field="payload" title="byte 149 · 0x70">70</span>
+          <span class="f-payload" data-byte="150" data-field="payload" title="byte 150 · 0x79">79</span>
+          <span class="f-payload" data-byte="151" data-field="payload" title="byte 151 · 0x6c">6c</span>
+          <span class="f-payload" data-byte="152" data-field="payload" title="byte 152 · 0x65">65</span>
+          <span class="f-payload" data-byte="153" data-field="payload" title="byte 153 · 0x66">66</span>
+          <span class="f-payload" data-byte="154" data-field="payload" title="byte 154 · 0x74">74</span>
+          <span class="f-payload" data-byte="155" data-field="payload" title="byte 155 · 0x20">20</span>
+          <span class="f-payload" data-byte="156" data-field="payload" title="byte 156 · 0x32">32</span>
+          <span class="f-payload" data-byte="157" data-field="payload" title="byte 157 · 0x30">30</span>
+          <span class="f-payload" data-byte="158" data-field="payload" title="byte 158 · 0x30">30</span>
+          <span class="f-payload" data-byte="159" data-field="payload" title="byte 159 · 0x33">33</span>
+          <span class="f-payload" data-byte="160" data-field="payload" title="byte 160 · 0x2d">2d</span>
+          <span class="f-payload" data-byte="161" data-field="payload" title="byte 161 · 0x32">32</span>
+          <span class="f-payload" data-byte="162" data-field="payload" title="byte 162 · 0x30">30</span>
+          <span class="f-payload" data-byte="163" data-field="payload" title="byte 163 · 0x32">32</span>
+          <span class="f-payload" data-byte="164" data-field="payload" title="byte 164 · 0x35">35</span>
+          <span class="f-payload" data-byte="165" data-field="payload" title="byte 165 · 0x20">20</span>
+          <span class="f-payload" data-byte="166" data-field="payload" title="byte 166 · 0x2d">2d</span>
+          <span class="f-payload" data-byte="167" data-field="payload" title="byte 167 · 0x20">20</span>
+          <span class="f-payload" data-byte="168" data-field="payload" title="byte 168 · 0x68">68</span>
+          <span class="f-payload" data-byte="169" data-field="payload" title="byte 169 · 0x74">74</span>
+          <span class="f-payload" data-byte="170" data-field="payload" title="byte 170 · 0x74">74</span>
+          <span class="f-payload" data-byte="171" data-field="payload" title="byte 171 · 0x70">70</span>
+          <span class="f-payload" data-byte="172" data-field="payload" title="byte 172 · 0x3a">3a</span>
+          <span class="f-payload" data-byte="173" data-field="payload" title="byte 173 · 0x2f">2f</span>
+          <span class="f-payload" data-byte="174" data-field="payload" title="byte 174 · 0x2f">2f</span>
+          <span class="f-payload" data-byte="175" data-field="payload" title="byte 175 · 0x77">77</span>
+          <span class="f-payload" data-byte="176" data-field="payload" title="byte 176 · 0x77">77</span>
+          <span class="f-payload" data-byte="177" data-field="payload" title="byte 177 · 0x77">77</span>
+          <span class="f-payload" data-byte="178" data-field="payload" title="byte 178 · 0x2e">2e</span>
+          <span class="f-payload" data-byte="179" data-field="payload" title="byte 179 · 0x76">76</span>
+          <span class="f-payload" data-byte="180" data-field="payload" title="byte 180 · 0x69">69</span>
+          <span class="f-payload" data-byte="181" data-field="payload" title="byte 181 · 0x64">64</span>
+          <span class="f-payload" data-byte="182" data-field="payload" title="byte 182 · 0x65">65</span>
+          <span class="f-payload" data-byte="183" data-field="payload" title="byte 183 · 0x6f">6f</span>
+          <span class="f-payload" data-byte="184" data-field="payload" title="byte 184 · 0x6c">6c</span>
+          <span class="f-payload" data-byte="185" data-field="payload" title="byte 185 · 0x61">61</span>
+          <span class="f-payload" data-byte="186" data-field="payload" title="byte 186 · 0x6e">6e</span>
+          <span class="f-payload" data-byte="187" data-field="payload" title="byte 187 · 0x2e">2e</span>
+        </div>
+
+        <ul class="legend">
+          <li data-field="sync"><i style="background: var(--amber); border-color: var(--amber)"></i>sync</li>
+          <li data-field="pid"><i style="background: color-mix(in oklab, var(--amber) 24%, var(--paper)); border-color: var(--amber)"></i>identifier</li>
+          <li data-field="flags"><i style="background: color-mix(in oklab, var(--stamp) 26%, var(--paper)); border-color: var(--stamp)"></i>flags</li>
+          <li data-field="af"><i style="background: color-mix(in oklab, var(--ink-2) 18%, var(--paper)); border-color: var(--rule)"></i>adaptation</li>
+          <li data-field="pcr"><i style="background: color-mix(in oklab, var(--amber) 42%, var(--paper)); border-color: var(--amber)"></i>clock</li>
+          <li><i style="background: var(--paper-2); border-color: var(--rule)"></i>payload</li>
+        </ul>
+
+        <div class="readout" id="byte-readout">
+          <div><dt>byte</dt><dd data-field="offset">0</dd></div>
+          <div><dt>value</dt><dd data-field="value">0x47</dd></div>
+          <div><dt>field</dt><dd data-field="field">sync byte</dd></div>
+        </div>
+
+        <p style="margin-top:18px">Read left to right, the packet says: sync,
+        packet identifier 256 with the payload-unit flag set, adaptation field of
+        seven bytes with a clock in it, then 176 bytes of payload that begin
+        <code>00 00 01 e0</code> — a video PES packet. The clock reads
+        22,356,000 ticks of 27 MHz, which is 0.828 s into the stream.</p>
+      </div>
+    </div>
+
+    <div class="section-head" style="margin-top:52px">
+      <div>
+        <p class="kicker">What this shows</p>
+        <h2>The three sizes of a stream</h2>
+      </div>
+      <p>A player sees segments; a decoder sees a fragment; the wire sees packets.</p>
+    </div>
+    <div class="prose" style="max-width:74ch">
+      <p>The three views are the same video. A segment is what a player asks
+      for by URL and what a playlist names. Inside it, a fragment tells a decoder
+      where the samples are without reading the whole file. Underneath, the same
+      bytes travel as packets, because a transport stream has to be readable from
+      anywhere in it — a receiver that joins in the middle finds the clock and the
+      tables without needing the beginning.</p>
+      <p>Reading one and writing the other is the whole library:
+      <a href="guide.html#package">the packager</a> turns a file into segments,
+      <a href="api.html#mp4">the box layer</a> reads a segment apart, and
+      <a href="api.html#ts">the transport layer</a> does the same for packets.</p>
+    </div>
+  </div>
+</main>
+
+<footer class="site-foot">
+  <div class="perf" aria-hidden="true"></div>
+  <div class="inner">
+    <div>
+      <a class="brand" href="index.html"><b>moonmedia</b> <span>for MoonBit</span></a>
+      <p>Apache-2.0 · No sockets, no files</p>
+    </div>
+    <nav aria-label="Footer">
+      <a href="index.html">Homepage</a>
+      <a href="guide.html">Guide</a>
+      <a href="api.html">API</a>
+      <a href="https://github.com/moonbitstack/moonmedia">Source</a>
+      <a href="https://mooncakes.io/docs/moonbitstack/moonmedia">mooncakes</a>
+    </nav>
+  </div>
+</footer>
+
+<script src="site.js" defer></script>
+</body>
+</html>

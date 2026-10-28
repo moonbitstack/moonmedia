@@ -1,4 +1,19 @@
-# moonmedia
+<h1 align="center">moonmedia</h1>
+
+<p align="center">
+  <sub>HLS · DASH · fragmented MP4 · MPEG-TS · RTMP</sub><br>
+  <sub><code>188 bytes · 90 kHz · 33 bits of clock</code></sub>
+</p>
+
+<p align="center">
+  <a href="https://moonbitstack.github.io/moonmedia/"><b>Homepage</b></a>
+  &nbsp;·&nbsp;
+  <a href="https://moonbitstack.github.io/moonmedia/guide.html">Guide</a>
+  &nbsp;·&nbsp;
+  <a href="https://moonbitstack.github.io/moonmedia/api.html">API</a>
+  &nbsp;·&nbsp;
+  <a href="https://mooncakes.io/docs/moonbitstack/moonmedia">mooncakes</a>
+</p>
 
 Containers and playlists for segmented streaming: the bytes a player fetches, the
 document that says which pieces exist, and the protocol a publisher pushes them

@@ -1,0 +1,16 @@
+// Real Time Messaging Protocol 1.0: the handshake, the chunk stream, the
+// messages publishers push, and the state machine a publisher drives.
+//
+// https://rtmp.veriskope.com/docs/spec/
+//
+// Bytes in, bytes out. Nothing here opens a socket: a server hands the session
+// whatever arrived and sends back what the session produced.
+import {
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/debug",
+  "moonbitlang/core/encoding/utf8",
+}
+
+import {
+  "moonbitlang/core/encoding/base64",
+} for "test"

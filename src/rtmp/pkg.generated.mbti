@@ -1,0 +1,161 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moonmedia/rtmp"
+
+import {
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub fn acknowledgement(Int32) -> Message
+
+pub fn client_finish(BytesView) -> Bytes raise RtmpError
+
+pub fn client_start(Int32, random? : Bytes) -> Bytes
+
+pub fn control(Int32, Bytes) -> Message
+
+pub fn decode_all(BytesView) -> Array[Amf0] raise RtmpError
+
+pub let default_chunk_size : Int32
+
+pub fn encode_all(Array[Amf0]) -> Bytes
+
+pub let msg_abort : Int32
+
+pub let msg_acknowledgement : Int32
+
+pub let msg_audio : Int32
+
+pub let msg_command : Int32
+
+pub let msg_data : Int32
+
+pub let msg_set_chunk_size : Int32
+
+pub let msg_set_peer_bandwidth : Int32
+
+pub let msg_user_control : Int32
+
+pub let msg_video : Int32
+
+pub let msg_window_ack_size : Int32
+
+pub fn pong(Int32) -> Message
+
+pub let random_size : Int32
+
+pub fn set_chunk_size(Int32) -> Message
+
+pub fn set_peer_bandwidth(Int32, Int32) -> Message
+
+pub let version : Int32
+
+pub fn window_ack_size(Int32) -> Message
+
+// Errors
+pub(all) suberror RtmpError {
+  Malformed(at~ : Int32, want~ : String, got~ : String)
+}
+pub fn RtmpError::output(Self, &Logger) -> Unit
+pub fn RtmpError::to_string(Self) -> String
+pub impl Show for RtmpError
+
+// Types and methods
+pub(all) enum Amf0 {
+  Number(Double)
+  Boolean(Bool)
+  String(String)
+  Null
+  Undefined
+  Object(Array[(String, Amf0)])
+  EcmaArray(Array[(String, Amf0)])
+  StrictArray(Array[Amf0])
+  Date(Double, Int32)
+} derive(Eq, @debug.Debug)
+pub fn Amf0::as_boolean(Self) -> Bool?
+pub fn Amf0::as_number(Self) -> Double?
+pub fn Amf0::as_string(Self) -> String?
+pub fn Amf0::decode(BytesView, at? : Int32) -> (Self, Int32) raise RtmpError
+pub fn Amf0::encode(Self) -> Bytes
+pub fn Amf0::equal(Self, Self) -> Bool
+pub fn Amf0::field(Self, StringView) -> Self?
+pub fn Amf0::not_equal(Self, Self) -> Bool
+pub fn Amf0::number(Double) -> Self
+pub fn Amf0::pairs(Self) -> Array[(String, Self)]
+pub fn Amf0::text(String) -> Self
+pub fn Amf0::to_repr(Self) -> @debug.Repr
+
+pub struct ChunkReader {
+  pending : @buffer.Buffer
+  streams : Array[Stream]
+  mut chunk_size : Int32
+}
+pub fn ChunkReader::new() -> Self
+pub fn ChunkReader::push(Self, BytesView) -> Array[Message]
+pub fn ChunkReader::set_chunk_size(Self, Int32) -> Unit
+
+pub(all) struct ChunkWriter {
+  mut chunk_size : Int32
+}
+pub fn ChunkWriter::new() -> Self
+pub fn ChunkWriter::write(Self, Message, chunk_id? : Int32) -> Bytes
+
+pub struct Handshake {
+  random : Bytes
+  mut s1 : Bytes
+  mut c1 : Bytes
+  mut complete : Bool
+}
+pub fn Handshake::answer(Self, BytesView, time? : Int32) -> Bytes raise RtmpError
+pub fn Handshake::complete_with(Self, BytesView) -> Unit raise RtmpError
+pub fn Handshake::is_complete(Self) -> Bool
+pub fn Handshake::new(random? : Bytes) -> Self
+
+pub(all) struct Message {
+  type_ : Int32
+  stream_id : Int32
+  timestamp : Int32
+  payload : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Message::equal(Self, Self) -> Bool
+pub fn Message::new(Int32, Int32, Bytes, timestamp? : Int32) -> Self
+pub fn Message::not_equal(Self, Self) -> Bool
+pub fn Message::to_repr(Self) -> @debug.Repr
+
+pub(all) enum Phase {
+  Opening
+  Answering
+  Connected
+  Publishing
+  Closed
+} derive(Eq, @debug.Debug)
+pub fn Phase::equal(Self, Self) -> Bool
+pub fn Phase::not_equal(Self, Self) -> Bool
+pub fn Phase::to_repr(Self) -> @debug.Repr
+
+pub struct Session {
+  handshake : Handshake
+  reader : ChunkReader
+  writer : ChunkWriter
+  pending : @buffer.Buffer
+  mut phase : Phase
+  mut application : String
+  mut name : String
+  mut stream_id : Int32
+  mut media : Array[Message]
+  mut metadata : Array[(String, Amf0)]
+  mut bytes_in : Int32
+}
+pub fn Session::app(Self) -> String
+pub fn Session::bytes_received(Self) -> Int32
+pub fn Session::metadata(Self) -> Array[(String, Amf0)]
+pub fn Session::new() -> Self
+pub fn Session::phase(Self) -> Phase
+pub fn Session::push(Self, BytesView) -> Array[Bytes] raise RtmpError
+pub fn Session::stream_name(Self) -> String
+pub fn Session::take_media(Self) -> Array[Message]
+
+// Type aliases
+
+// Traits

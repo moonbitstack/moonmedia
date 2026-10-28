@@ -1,0 +1,160 @@
+// Generated using `moon info`, DON'T EDIT IT
+package "moonbitstack/moonmedia/ts"
+
+import {
+  "moonbitlang/core/debug",
+}
+
+// Values
+pub let audio_stream_base : Int32
+
+pub fn continues(Packet, Packet) -> Bool
+
+pub fn crc32(BytesView) -> Int32
+
+pub fn next_counter(Int32, Packet) -> Int32
+
+pub let null_pid : Int32
+
+pub let packet_size : Int32
+
+pub fn parse(BytesView) -> Array[Packet] raise TsError
+
+pub let pat_pid : Int32
+
+pub fn pes_packets(Array[Packet], Int32) -> Array[Pes] raise TsError
+
+pub fn sections(Array[Packet], Int32) -> Array[Section] raise TsError
+
+pub let sync_byte : Int32
+
+pub let table_pat : Int32
+
+pub let table_pmt : Int32
+
+pub let video_stream_base : Int32
+
+// Errors
+pub(all) suberror TsError {
+  Malformed(at~ : Int32, want~ : String, got~ : String)
+}
+pub fn TsError::output(Self, &Logger) -> Unit
+pub fn TsError::to_string(Self) -> String
+pub impl Show for TsError
+
+// Types and methods
+pub(all) struct Adaptation {
+  raw : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Adaptation::discontinuity(Self) -> Bool
+pub fn Adaptation::equal(Self, Self) -> Bool
+pub fn Adaptation::length(Self) -> Int32
+pub fn Adaptation::new(stuffing? : Int32) -> Self
+pub fn Adaptation::not_equal(Self, Self) -> Bool
+pub fn Adaptation::pcr(Self) -> Int64?
+pub fn Adaptation::random_access(Self) -> Bool
+pub fn Adaptation::stuffing(Self) -> Int32
+pub fn Adaptation::to_repr(Self) -> @debug.Repr
+pub fn Adaptation::with_pcr(Int64, stuffing? : Int32) -> Self
+
+pub(all) struct Packet {
+  error : Bool
+  starts_unit : Bool
+  priority : Bool
+  pid : Int32
+  scrambling : Int32
+  counter : Int32
+  adaptation : Adaptation?
+  payload : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Packet::encode(Self) -> Bytes
+pub fn Packet::equal(Self, Self) -> Bool
+pub fn Packet::is_null(Self) -> Bool
+pub fn Packet::is_pat(Self) -> Bool
+pub fn Packet::new(Int32, Bytes, counter? : Int32, starts_unit? : Bool) -> Self
+pub fn Packet::not_equal(Self, Self) -> Bool
+pub fn Packet::parse(BytesView) -> Self raise TsError
+pub fn Packet::parse_at(BytesView, Int32, Int32) -> Self raise TsError
+pub fn Packet::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Pat {
+  transport_stream : Int32
+  version : Int32
+  programs : Array[Program]
+} derive(Eq, @debug.Debug)
+pub fn Pat::encode(Self) -> Bytes
+pub fn Pat::equal(Self, Self) -> Bool
+pub fn Pat::not_equal(Self, Self) -> Bool
+pub fn Pat::of(Section) -> Self raise TsError
+pub fn Pat::section(Self) -> Section
+pub fn Pat::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Pes {
+  stream_id : Int32
+  packet_length : Int32
+  flags : Int32
+  timestamp_flags : Int32
+  header : Bytes
+  data : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Pes::dts(Self) -> Int64?
+pub fn Pes::encode(Self) -> Bytes
+pub fn Pes::equal(Self, Self) -> Bool
+pub fn Pes::new(Int32, Bytes, pts? : Int64, dts? : Int64) -> Self
+pub fn Pes::not_equal(Self, Self) -> Bool
+pub fn Pes::parse(BytesView, at? : Int32) -> Self raise TsError
+pub fn Pes::pts(Self) -> Int64?
+pub fn Pes::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Pmt {
+  program : Int32
+  pcr_pid : Int32
+  version : Int32
+  descriptors : Bytes
+  streams : Array[Stream]
+} derive(Eq, @debug.Debug)
+pub fn Pmt::encode(Self) -> Bytes
+pub fn Pmt::equal(Self, Self) -> Bool
+pub fn Pmt::not_equal(Self, Self) -> Bool
+pub fn Pmt::of(Section) -> Self raise TsError
+pub fn Pmt::section(Self) -> Section
+pub fn Pmt::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Program {
+  number : Int32
+  pid : Int32
+} derive(Eq, @debug.Debug)
+pub fn Program::equal(Self, Self) -> Bool
+pub fn Program::not_equal(Self, Self) -> Bool
+pub fn Program::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Section {
+  table_id : Int32
+  table_id_extension : Int32
+  version : Int32
+  current : Bool
+  number : Int32
+  last_number : Int32
+  body : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Section::encode(Self) -> Bytes
+pub fn Section::equal(Self, Self) -> Bool
+pub fn Section::is_intact(Self) -> Bool
+pub fn Section::new(table_id? : Int32, extension? : Int32, version? : Int32, number? : Int32, last_number? : Int32, body? : Bytes) -> Self
+pub fn Section::not_equal(Self, Self) -> Bool
+pub fn Section::packets(Self, Int32, counter? : Int32) -> Array[Packet]
+pub fn Section::parse(BytesView, Int32) -> (Self, Int32) raise TsError
+pub fn Section::to_repr(Self) -> @debug.Repr
+
+pub(all) struct Stream {
+  stream_type : Int32
+  pid : Int32
+  descriptors : Bytes
+} derive(Eq, @debug.Debug)
+pub fn Stream::equal(Self, Self) -> Bool
+pub fn Stream::not_equal(Self, Self) -> Bool
+pub fn Stream::to_repr(Self) -> @debug.Repr
+
+// Type aliases
+
+// Traits

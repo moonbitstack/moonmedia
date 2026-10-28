@@ -1,0 +1,15 @@
+// MPEG-2 transport streams, ISO/IEC 13818-1: packets, the tables that say what
+// is in the stream, and the packetised elementary stream inside it.
+//
+// https://www.iso.org/standard/62064.html
+//
+// Bytes in, data out. A packet read and written again is the same 188 bytes,
+// which is what lets a stream pass through this package without being rebuilt.
+import {
+  "moonbitlang/core/buffer",
+  "moonbitlang/core/debug",
+}
+
+import {
+  "moonbitlang/core/encoding/base64",
+} for "test"

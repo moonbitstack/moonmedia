@@ -341,6 +341,44 @@ test "a box nobody named keeps its payload and its size form" {
 }
 
 ///|
+test "a segment index reads and writes the references it carries" {
+  let index : @mp4.SegmentIndex = {
+    reference_id: 1,
+    timescale: 1000L,
+    earliest_presentation_time: 0L,
+    first_offset: 0L,
+    references: [
+      {
+        reference_type: false,
+        referenced_size: 12_345L,
+        subsegment_duration: 4000L,
+        starts_with_sap: true,
+        sap_type: 1,
+        sap_delta_time: 0L,
+      },
+      {
+        reference_type: false,
+        referenced_size: 6789L,
+        subsegment_duration: 4000L,
+        starts_with_sap: false,
+        sap_type: 0,
+        sap_delta_time: 0L,
+      },
+    ],
+  }
+  let box = @mp4.parse(index.encode()[:])[0]
+  assert_eq(box.type_, "sidx")
+  let back = @mp4.segment_index(box)
+  assert_eq(back, index)
+  // The box a player reads says how long the whole run of references lasts.
+  assert_eq(back.references[0].subsegment_duration, 4000L)
+  assert_eq(back.references[0].referenced_size, 12_345L)
+  assert_eq(back.references[1].referenced_size, 6789L)
+  assert_eq(back.references[0].starts_with_sap, true)
+  assert_eq(back.references[1].starts_with_sap, false)
+}
+
+///|
 test "panic: a box that ends past the file is refused" {
   // A movie header claiming more bytes than the file holds.
   let data = Bytes::from_array([

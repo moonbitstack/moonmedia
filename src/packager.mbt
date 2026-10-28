@@ -400,15 +400,20 @@ fn cut_points(tracks : Array[@mp4.Track], target : Double) -> Array[Cut] {
 
 ///|
 /// The samples of `track` that belong to each cut.
+///
+/// The last cut takes whatever is left, whatever its end says: a track may run
+/// past the one the cuts were measured on — audio usually does, by a fraction of
+/// a frame — and dropping the tail would cut the sound off.
 fn split(track : Track, cuts : Array[Cut]) -> Array[Array[Sample]] {
   let out : Array[Array[Sample]] = []
   let mut cursor = 0
-  for cut in cuts {
+  for i, cut in cuts {
+    let last = i + 1 == cuts.length()
     let picked : Array[Sample] = []
     while cursor < track.samples.length() {
       let sample = track.samples[cursor]
       let at = micros(sample.dts, track.timescale)
-      if at >= cut.end {
+      if !last && at >= cut.end {
         break
       }
       if at >= cut.start {

@@ -95,6 +95,7 @@ pub fn FragmentTrack::to_repr(Self) -> @debug.Repr
 
 pub(all) struct IndexReference {
   reference_type : Bool
+  referenced_size : Int64
   subsegment_duration : Int64
   starts_with_sap : Bool
   sap_type : Int32
@@ -178,6 +179,7 @@ pub(all) struct SegmentIndex {
   first_offset : Int64
   references : Array[IndexReference]
 } derive(Eq, @debug.Debug)
+pub fn SegmentIndex::encode(Self) -> Bytes
 pub fn SegmentIndex::equal(Self, Self) -> Bool
 pub fn SegmentIndex::not_equal(Self, Self) -> Bool
 pub fn SegmentIndex::to_repr(Self) -> @debug.Repr

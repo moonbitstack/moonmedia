@@ -281,7 +281,10 @@ pub extend SegmentIndex with @moonbitlang/core/debug.Debug::{to_repr}
 /// One piece of a segment index: how big the next piece is and how long it
 /// plays, or a pointer to another index.
 pub(all) struct IndexReference {
+  /// Whether this points at another index rather than at media.
   reference_type : Bool
+  /// How many bytes the piece takes, or how large the index it points at is.
+  referenced_size : Int64
   subsegment_duration : Int64
   starts_with_sap : Bool
   sap_type : Int32
@@ -301,15 +304,17 @@ pub fn segment_index(box : Box) -> SegmentIndex raise Mp4Error {
   let version = read_u8(raw, 0)
   let reference_id = read_u32(raw, 4)
   let mut at = 8
+  // Between the last field and the count there are two reserved bytes, which is
+  // where a reader that counted from the wrong end of the box goes wrong.
   let (timescale, earliest, first_offset) = if version == 0 {
     let timescale = read_u32(raw, 8).to_int64()
     let earliest = read_u32(raw, 12).to_int64()
-    at = 20
+    at = 22
     (timescale, earliest, read_u32(raw, 16).to_int64())
   } else {
     let timescale = read_u32(raw, 8).to_int64()
     let earliest = read_u64(raw, 12)
-    at = 28
+    at = 30
     (timescale, earliest, read_u64(raw, 20))
   }
   let count = read_u16(raw, at)
@@ -321,6 +326,7 @@ pub fn segment_index(box : Box) -> SegmentIndex raise Mp4Error {
     let sap = read_u32(raw, at + i * 12 + 8)
     references.push({
       reference_type: (word & 0x8000_0000) != 0,
+      referenced_size: (word & 0x7FFF_FFFF).to_int64(),
       subsegment_duration: duration,
       starts_with_sap: (sap & 0x8000_0000) != 0,
       sap_type: (sap >> 28) & 0x7,
@@ -334,4 +340,44 @@ pub fn segment_index(box : Box) -> SegmentIndex raise Mp4Error {
     first_offset,
     references,
   }
+}
+
+///|
+/// Write a segment index back as a `sidx` box.
+///
+/// The version is chosen from the values: a presentation time or an offset past
+/// what 32 bits hold needs the wide form, and a reader that assumed the narrow
+/// one would run into the next field.
+pub fn SegmentIndex::encode(self : SegmentIndex) -> Bytes {
+  let wide = self.earliest_presentation_time > 0xFFFF_FFFFL ||
+    self.first_offset > 0xFFFF_FFFFL
+  let buf = @buffer.Buffer()
+  buf.write_byte(if wide { b'\x01' } else { b'\x00' })
+  buf.write_byte(b'\x00')
+  buf.write_byte(b'\x00')
+  buf.write_byte(b'\x00')
+  write_u32(buf, self.reference_id)
+  write_u32(buf, self.timescale.to_int())
+  if wide {
+    write_u64(buf, self.earliest_presentation_time)
+    write_u64(buf, self.first_offset)
+  } else {
+    write_u32(buf, self.earliest_presentation_time.to_int())
+    write_u32(buf, self.first_offset.to_int())
+  }
+  // Two reserved bytes, then the count of references.
+  buf.write_byte(b'\x00')
+  buf.write_byte(b'\x00')
+  buf.write_byte(((self.references.length() >> 8) & 0xFF).to_byte())
+  buf.write_byte((self.references.length() & 0xFF).to_byte())
+  for reference in self.references {
+    let kind = if reference.reference_type { 0x8000_0000 } else { 0 }
+    write_u32(buf, kind | (reference.referenced_size.to_int() & 0x7FFF_FFFF))
+    write_u32(buf, reference.subsegment_duration.to_int())
+    let sap = (if reference.starts_with_sap { 0x8000_0000 } else { 0 }) |
+      ((reference.sap_type & 0x7) << 28) |
+      (reference.sap_delta_time.to_int() & 0x0FFF_FFFF)
+    write_u32(buf, sap)
+  }
+  Box::bytes("sidx", buf.contents()).encode()
 }

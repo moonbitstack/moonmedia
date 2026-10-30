@@ -223,8 +223,10 @@ pre,
    indicator, and it is not there until the page has moved. The boxes that do
    scroll — code, the log, the cue sheet, the strip — keep a bar, drawn to
    match the stock they sit on. */
-html {
-  scrollbar-width: none;
+@supports not selector(::-webkit-scrollbar) {
+  html {
+    scrollbar-width: none;
+  }
 }
 
 html::-webkit-scrollbar {

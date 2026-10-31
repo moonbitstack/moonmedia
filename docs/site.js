@@ -169,52 +169,14 @@ function demo() {
 function scrollRail() {
   const rail = document.querySelector(".scroll-rail");
   if (!rail) return;
-  const thumb = rail.querySelector(".thumb");
   const doc = document.documentElement;
 
-  const size = () => {
-    const height = window.innerHeight;
-    const total = doc.scrollHeight;
-    const max = Math.max(total - height, 0);
-    const length = Math.max(46, (height / Math.max(total, 1)) * height);
-    return { height, total, max, length, travel: height - length };
-  };
-
   const paint = () => {
-    const { max, length, travel } = size();
-    const y = window.scrollY;
+    const max = Math.max(doc.scrollHeight - window.innerHeight, 0);
     // The rail is a sign that the page continues; at the top it would be
     // furniture over a page that has not started.
-    rail.classList.toggle("on", y > 6 && max > 120);
-    if (max <= 0) return;
-    thumb.style.height = `${length}px`;
-    thumb.style.transform = `translateY(${(y / max) * travel}px)`;
+    rail.classList.toggle("on", window.scrollY > 6 && max > 120);
   };
-
-  let dragging = false;
-  let from = 0;
-  let scroll = 0;
-
-  thumb.addEventListener("pointerdown", (event) => {
-    dragging = true;
-    from = event.clientY;
-    scroll = window.scrollY;
-    thumb.setPointerCapture(event.pointerId);
-    event.preventDefault();
-  });
-
-  thumb.addEventListener("pointermove", (event) => {
-    if (!dragging) return;
-    const { max, travel } = size();
-    if (travel <= 0) return;
-    window.scrollTo(0, scroll + ((event.clientY - from) / travel) * max);
-  });
-
-  const stop = () => {
-    dragging = false;
-  };
-  thumb.addEventListener("pointerup", stop);
-  thumb.addEventListener("pointercancel", stop);
 
   window.addEventListener("scroll", paint, { passive: true });
   window.addEventListener("resize", paint);

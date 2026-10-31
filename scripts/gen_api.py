@@ -425,7 +425,7 @@ def main():
 <body>
 <div class="grain" aria-hidden="true"></div>
 <div class="vignette" aria-hidden="true"></div>
-<div class="scroll-rail" aria-hidden="true"><div class="thumb"></div></div>
+<div class="scroll-rail" aria-hidden="true"></div>
 
 <div class="perf" aria-hidden="true"></div>
 <header class="site-head">

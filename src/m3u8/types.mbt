@@ -7,10 +7,11 @@
 /// `offset` absent means "immediately after the previous range", which is what
 /// the tag itself means when the `@` clause is left out. Keeping the two apart
 /// matters: a reader that filled in zero would fetch the wrong bytes.
+#derive(Eq, Debug)
 pub(all) struct ByteRange {
   mut length : Int64
   mut offset : Int64?
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend ByteRange with Eq::{equal, not_equal}
@@ -29,12 +30,13 @@ pub fn ByteRange::new(length : Int64, offset? : Int64) -> ByteRange {
 ///
 /// `Other` carries a method this release does not implement, so a playlist that
 /// uses one is read and written back unchanged rather than refused.
+#derive(Eq, Debug)
 pub(all) enum Cipher {
   None
   Aes128
   SampleAes
   Other(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Cipher with Eq::{equal, not_equal}
@@ -74,6 +76,7 @@ pub fn Cipher::of(code : StringView) -> Cipher {
 /// tag that introduced it: a tag applies to every following segment until it
 /// is replaced, and a caller hunting for "what encrypts this segment" should
 /// not have to replay the file to find out.
+#derive(Eq, Debug)
 pub(all) struct Key {
   mut cipher : Cipher
   mut uri : String?
@@ -81,7 +84,7 @@ pub(all) struct Key {
   mut key_format : String?
   mut key_format_versions : String?
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Key with Eq::{equal, not_equal}
@@ -117,10 +120,11 @@ pub fn Key::is_plain(self : Key) -> Bool {
 ///|
 /// The initialisation section a segment needs before it can be decoded, the
 /// `EXT-X-MAP` tag (RFC 8216 §4.3.2.5).
+#derive(Eq, Debug)
 pub(all) struct InitSection {
   mut uri : String
   mut byte_range : ByteRange?
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend InitSection with Eq::{equal, not_equal}
@@ -137,13 +141,14 @@ pub fn InitSection::new(uri : String, byte_range? : ByteRange) -> InitSection {
 ///|
 /// A partial segment, the unit low-latency HLS publishes before a segment is
 /// complete (RFC 8216bis §4.4.4.9).
+#derive(Eq, Debug)
 pub(all) struct Part {
   mut uri : String
   mut duration : Double
   mut independent : Bool
   mut byte_range : ByteRange?
   mut gap : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Part with Eq::{equal, not_equal}
@@ -172,6 +177,7 @@ pub fn Part::new(
 ///|
 /// One media segment: the URI a player fetches and everything the playlist says
 /// about it.
+#derive(Eq, Debug)
 pub(all) struct Segment {
   mut uri : String
   mut duration : Double
@@ -183,7 +189,7 @@ pub(all) struct Segment {
   mut key : Key?
   mut map : InitSection?
   mut parts : Array[Part]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Segment with Eq::{equal, not_equal}
@@ -214,10 +220,11 @@ pub fn Segment::new(
 
 ///|
 /// A frame size, `1920x1080`.
+#derive(Eq, Debug)
 pub(all) struct Resolution {
   mut width : Int32
   mut height : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Resolution with Eq::{equal, not_equal}
@@ -234,6 +241,7 @@ pub fn Resolution::new(width : Int32, height : Int32) -> Resolution {
 ///|
 /// One rendition of a master playlist, the body of `EXT-X-STREAM-INF`
 /// (RFC 8216 §4.3.4.2).
+#derive(Eq, Debug)
 pub(all) struct Variant {
   mut uri : String
   mut bandwidth : Int32?
@@ -250,7 +258,7 @@ pub(all) struct Variant {
   mut pathway_id : String?
   mut stable_variant_id : String?
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Variant with Eq::{equal, not_equal}
@@ -286,13 +294,14 @@ pub fn Variant::new(
 
 ///|
 /// What an `EXT-X-MEDIA` rendition carries (RFC 8216 §4.3.4.1).
+#derive(Eq, Debug)
 pub(all) enum MediaKind {
   Audio
   Video
   Subtitles
   ClosedCaptions
   Other(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend MediaKind with Eq::{equal, not_equal}
@@ -330,6 +339,7 @@ pub fn MediaKind::of(code : StringView) -> MediaKind {
 
 ///|
 /// An alternative rendition a variant can switch to (RFC 8216 §4.3.4.1).
+#derive(Eq, Debug)
 pub(all) struct Rendition {
   mut kind : MediaKind
   mut group_id : String
@@ -346,7 +356,7 @@ pub(all) struct Rendition {
   mut autoselect : Bool
   mut forced : Bool
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Rendition with Eq::{equal, not_equal}
@@ -383,6 +393,7 @@ pub fn Rendition::new(
 
 ///|
 /// An I-frame only rendition, `EXT-X-I-FRAME-STREAM-INF` (RFC 8216 §4.3.4.3).
+#derive(Eq, Debug)
 pub(all) struct IFrameStream {
   mut uri : String
   mut bandwidth : Int32?
@@ -394,7 +405,7 @@ pub(all) struct IFrameStream {
   mut pathway_id : String?
   mut stable_variant_id : String?
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend IFrameStream with Eq::{equal, not_equal}
@@ -421,13 +432,14 @@ pub fn IFrameStream::new(uri : String, bandwidth? : Int32) -> IFrameStream {
 
 ///|
 /// A piece of session metadata, `EXT-X-SESSION-DATA` (RFC 8216 §4.3.4.4).
+#derive(Eq, Debug)
 pub(all) struct SessionData {
   mut data_id : String
   mut value : String?
   mut uri : String?
   mut language : String?
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend SessionData with Eq::{equal, not_equal}
@@ -448,10 +460,11 @@ pub fn SessionData::new(
 
 ///|
 /// Where playback should start, `EXT-X-START` (RFC 8216 §4.3.5.2).
+#derive(Eq, Debug)
 pub(all) struct Start {
   mut time_offset : Double
   mut precise : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Start with Eq::{equal, not_equal}
@@ -468,6 +481,7 @@ pub fn Start::new(time_offset : Double, precise? : Bool) -> Start {
 ///|
 /// The reload advice a low-latency server gives, `EXT-X-SERVER-CONTROL`
 /// (RFC 8216bis §4.4.3.8).
+#derive(Eq, Debug)
 pub(all) struct ServerControl {
   mut can_skip_until : Double?
   mut can_skip_date_ranges : Bool
@@ -475,7 +489,7 @@ pub(all) struct ServerControl {
   mut part_hold_back : Double?
   mut can_block_reload : Bool
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend ServerControl with Eq::{equal, not_equal}
@@ -499,13 +513,14 @@ pub fn ServerControl::new() -> ServerControl {
 ///|
 /// What to fetch next before it is listed, `EXT-X-PRELOAD-HINT`
 /// (RFC 8216bis §4.4.4.10).
+#derive(Eq, Debug)
 pub(all) struct PreloadHint {
   mut kind : String
   mut uri : String
   mut byte_range : ByteRange?
   mut start : Int64?
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend PreloadHint with Eq::{equal, not_equal}
@@ -527,12 +542,13 @@ pub fn PreloadHint::new(
 ///|
 /// How far along a sibling rendition is, `EXT-X-RENDITION-REPORT`
 /// (RFC 8216bis §4.4.4.11).
+#derive(Eq, Debug)
 pub(all) struct RenditionReport {
   mut uri : String
   mut last_msn : Int64?
   mut last_part : Int32?
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend RenditionReport with Eq::{equal, not_equal}
@@ -553,6 +569,7 @@ pub fn RenditionReport::new(
 ///|
 /// A wall-clock interval the stream marks, `EXT-X-DATERANGE`
 /// (RFC 8216 §4.3.2.7).
+#derive(Eq, Debug)
 pub(all) struct DateRange {
   mut id : String
   mut class_ : String?
@@ -565,7 +582,7 @@ pub(all) struct DateRange {
   mut scte35_in : String?
   mut end_on_next : Bool
   mut extra : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend DateRange with Eq::{equal, not_equal}
@@ -593,11 +610,12 @@ pub fn DateRange::new(id : String, start_date? : String) -> DateRange {
 
 ///|
 /// What kind of playlist a media playlist is (RFC 8216 §4.3.3.5).
+#derive(Eq, Debug)
 pub(all) enum PlaylistType {
   Event
   Vod
   Other(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend PlaylistType with Eq::{equal, not_equal}
@@ -607,12 +625,13 @@ pub extend PlaylistType with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
 /// A variable the playlist defines, `EXT-X-DEFINE` (RFC 8216bis §4.4.2.3).
+#derive(Eq, Debug)
 pub(all) struct Define {
   mut name : String?
   mut value : String?
   mut import_ : String?
   mut queryparam : String?
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Define with Eq::{equal, not_equal}
@@ -629,6 +648,7 @@ pub fn Define::new(name : String, value : String) -> Define {
 ///|
 /// A master playlist: which renditions exist and how to reach them
 /// (RFC 8216 §4.3.4).
+#derive(Eq, Debug)
 pub(all) struct Master {
   mut version : Int32?
   mut independent_segments : Bool
@@ -640,7 +660,7 @@ pub(all) struct Master {
   mut variants : Array[Variant]
   mut i_frame_streams : Array[IFrameStream]
   mut unknown : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Master with Eq::{equal, not_equal}
@@ -667,6 +687,7 @@ pub fn Master::new() -> Master {
 
 ///|
 /// A media playlist: the segments of one rendition (RFC 8216 §4.3.3).
+#derive(Eq, Debug)
 pub(all) struct MediaPlaylist {
   mut version : Int32?
   mut target_duration : Int32
@@ -688,7 +709,7 @@ pub(all) struct MediaPlaylist {
   mut preload_hint : PreloadHint?
   mut rendition_reports : Array[RenditionReport]
   mut unknown : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend MediaPlaylist with Eq::{equal, not_equal}
@@ -726,10 +747,11 @@ pub fn MediaPlaylist::new(target_duration : Int32) -> MediaPlaylist {
 
 ///|
 /// A playlist, of one kind or the other.
+#derive(Eq, Debug)
 pub(all) enum Playlist {
   MasterPlaylist(Master)
   MediaPlaylist(MediaPlaylist)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Playlist with Eq::{equal, not_equal}

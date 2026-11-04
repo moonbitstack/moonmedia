@@ -62,6 +62,7 @@ pub fn RtmpError::to_string(Self) -> String
 pub impl Show for RtmpError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) enum Amf0 {
   Number(Double)
   Boolean(Bool)
@@ -72,7 +73,7 @@ pub(all) enum Amf0 {
   EcmaArray(Array[(String, Amf0)])
   StrictArray(Array[Amf0])
   Date(Double, Int32)
-} derive(Eq, @debug.Debug)
+}
 pub fn Amf0::as_boolean(Self) -> Bool?
 pub fn Amf0::as_number(Self) -> Double?
 pub fn Amf0::as_string(Self) -> String?
@@ -112,24 +113,26 @@ pub fn Handshake::complete_with(Self, BytesView) -> Unit raise RtmpError
 pub fn Handshake::is_complete(Self) -> Bool
 pub fn Handshake::new(random? : Bytes) -> Self
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Message {
   type_ : Int32
   stream_id : Int32
   timestamp : Int32
   payload : Bytes
-} derive(Eq, @debug.Debug)
+}
 pub fn Message::equal(Self, Self) -> Bool
 pub fn Message::new(Int32, Int32, Bytes, timestamp? : Int32) -> Self
 pub fn Message::not_equal(Self, Self) -> Bool
 pub fn Message::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Phase {
   Opening
   Answering
   Connected
   Publishing
   Closed
-} derive(Eq, @debug.Debug)
+}
 pub fn Phase::equal(Self, Self) -> Bool
 pub fn Phase::not_equal(Self, Self) -> Bool
 pub fn Phase::to_repr(Self) -> @debug.Repr

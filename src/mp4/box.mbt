@@ -29,10 +29,11 @@ pub impl Show for Mp4Error with fn output(self, logger) {
 /// both — a sample description entry is a fixed header followed by child boxes —
 /// keep the fixed part in `prefix` and the children after it, so the tree stays
 /// generic without losing a byte.
+#derive(Eq, Debug)
 pub(all) enum Content {
   Children(prefix~ : Bytes, boxes~ : Array[Box])
   Bytes(raw~ : Bytes)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Content with Eq::{equal, not_equal}
@@ -46,12 +47,13 @@ pub extend Content with @moonbitlang/core/debug.Debug::{to_repr}
 /// `large` remembers that the size was written as a 64-bit field rather than
 /// the usual 32-bit one, because writing it back the other way would change the
 /// file even though it would still be readable.
+#derive(Eq, Debug)
 pub(all) struct Box {
   type_ : String
   usertype : Bytes?
   large : Bool
   content : Content
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Box with Eq::{equal, not_equal}

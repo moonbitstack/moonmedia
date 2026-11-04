@@ -47,13 +47,14 @@ pub let default_chunk_size : Int32 = 128
 
 ///|
 /// A message: what a chunk stream carries once its chunks are put back together.
+#derive(Eq, Debug)
 pub(all) struct Message {
   type_ : Int32
   stream_id : Int32
   /// Milliseconds, and the same for every chunk of the message.
   timestamp : Int32
   payload : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Message with Eq::{equal, not_equal}

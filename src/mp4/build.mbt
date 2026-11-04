@@ -4,12 +4,13 @@
 ///|
 /// A sample as it is written into a fragment: its bytes and what the fragment
 /// has to say about it.
+#derive(Eq, Debug)
 pub(all) struct SampleData {
   data : Bytes
   duration : Int64
   composition_offset : Int64
   sync : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend SampleData with Eq::{equal, not_equal}
@@ -19,11 +20,12 @@ pub extend SampleData with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
 /// One track's contribution to a fragment.
+#derive(Eq, Debug)
 pub(all) struct FragmentTrack {
   track_id : Int32
   base_decode_time : Int64
   samples : Array[SampleData]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend FragmentTrack with Eq::{equal, not_equal}
@@ -33,10 +35,11 @@ pub extend FragmentTrack with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
 /// A movie fragment ready to be written: `moof` and the `mdat` it points at.
+#derive(Eq, Debug)
 pub(all) struct MovieFragment {
   sequence : Int32
   tracks : Array[FragmentTrack]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend MovieFragment with Eq::{equal, not_equal}

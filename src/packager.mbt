@@ -4,6 +4,7 @@
 ///|
 /// A segment of a packaged stream: the bytes a player fetches, and how long
 /// they play.
+#derive(Eq, Debug)
 pub(all) struct Segment {
   /// The fragment as bytes, a `moof` followed by its `mdat`.
   data : Bytes
@@ -16,7 +17,7 @@ pub(all) struct Segment {
   keyframe : Bool
   /// How many samples each track contributes, in track order.
   samples : Array[Int32]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Segment with Eq::{equal, not_equal}
@@ -53,12 +54,13 @@ pub(all) struct Track {
 
 ///|
 /// What a track carries.
+#derive(Eq, Debug)
 pub(all) enum TrackKind {
   Video
   Audio
   Subtitle
   Other(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend TrackKind with Eq::{equal, not_equal}
@@ -68,13 +70,14 @@ pub extend TrackKind with @moonbitlang/core/debug.Debug::{to_repr}
 
 ///|
 /// One sample, already cut out of the file it came from.
+#derive(Eq, Debug)
 pub(all) struct Sample {
   data : Bytes
   dts : Int64
   duration : Int64
   composition_offset : Int64
   sync : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Sample with Eq::{equal, not_equal}

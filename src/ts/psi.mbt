@@ -15,6 +15,7 @@ pub let table_pmt : Int32 = 0x02
 /// The body is kept as bytes because a table's shape is fixed but its contents
 /// are not, and a reader that wants the parsed form asks for `Pat::of` or
 /// `Pmt::of`.
+#derive(Eq, Debug)
 pub(all) struct Section {
   table_id : Int32
   /// The identifier of the stream the table describes.
@@ -24,7 +25,7 @@ pub(all) struct Section {
   number : Int32
   last_number : Int32
   body : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Section with Eq::{equal, not_equal}
@@ -138,12 +139,13 @@ fn read_u16(data : BytesView, at : Int32) -> Int32 raise TsError {
 
 ///|
 /// One entry of a programme association table.
+#derive(Eq, Debug)
 pub(all) struct Program {
   number : Int32
   /// The identifier of the packet that carries this programme's map table, or
   /// the network information table when `number` is zero.
   pid : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Program with Eq::{equal, not_equal}
@@ -159,11 +161,12 @@ pub fn Program::new(number : Int32, pid : Int32) -> Program {
 
 ///|
 /// The programme association table: which programme is on which identifier.
+#derive(Eq, Debug)
 pub(all) struct Pat {
   transport_stream : Int32
   version : Int32
   programs : Array[Program]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Pat with Eq::{equal, not_equal}
@@ -259,13 +262,14 @@ pub fn Section::new(
 
 ///|
 /// One elementary stream a programme carries.
+#derive(Eq, Debug)
 pub(all) struct Stream {
   /// What the stream is: 0x1B is H.264, 0x0F is AAC in ADTS, 0x24 is HEVC.
   stream_type : Int32
   pid : Int32
   /// The descriptors as they came, tag, length and payload together.
   descriptors : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Stream with Eq::{equal, not_equal}
@@ -286,13 +290,14 @@ pub fn Stream::new(
 ///|
 /// The programme map table: what a programme is made of, and which packet
 /// carries its clock.
+#derive(Eq, Debug)
 pub(all) struct Pmt {
   program : Int32
   pcr_pid : Int32
   version : Int32
   descriptors : Bytes
   streams : Array[Stream]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Pmt with Eq::{equal, not_equal}

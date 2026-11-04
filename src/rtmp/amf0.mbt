@@ -27,6 +27,7 @@ pub impl Show for RtmpError with fn output(self, logger) {
 /// name. The variants here are the ones a publish session meets; the rest of the
 /// encoding — references, records, XML — is not used by any publisher and is
 /// refused rather than guessed at.
+#derive(Eq, Debug)
 pub(all) enum Amf0 {
   Number(Double)
   Boolean(Bool)
@@ -40,7 +41,7 @@ pub(all) enum Amf0 {
   EcmaArray(Array[(String, Amf0)])
   StrictArray(Array[Amf0])
   Date(Double, Int32)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Amf0 with Eq::{equal, not_equal}

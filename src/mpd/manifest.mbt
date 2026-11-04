@@ -3,13 +3,14 @@
 
 ///|
 /// Whether a presentation is a file to play or a stream still being written.
+#derive(Eq, Debug)
 pub(all) enum Kind {
   /// A presentation that is complete.
   Static
   /// A presentation that keeps growing, where the manifest is reloaded.
   Dynamic
   Other(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Kind with Eq::{equal, not_equal}
@@ -42,6 +43,7 @@ pub fn Kind::of(code : StringView) -> Kind {
 ///|
 /// How the segments of a representation are addressed: a template with the
 /// numbers filled in, which is what almost every manifest uses.
+#derive(Eq, Debug)
 pub(all) struct Template {
   mut timescale : Int64?
   /// The length of a segment in timescale units, when they are all the same.
@@ -54,7 +56,7 @@ pub(all) struct Template {
   mut media : String?
   /// The segments' times and lengths, when they are not all the same.
   mut timeline : Array[Timeline]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Template with Eq::{equal, not_equal}
@@ -79,13 +81,14 @@ pub fn Template::new() -> Template {
 ///|
 /// Where a segment starts and how long it runs, for a stream whose segments do
 /// not have one length.
+#derive(Eq, Debug)
 pub(all) struct Timeline {
   /// The start, in timescale units; absent means "where the last one ended".
   mut time : Int64?
   mut duration : Int64
   /// How many times the entry repeats, `-1` for "until the next entry".
   mut repeat : Int32
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Timeline with Eq::{equal, not_equal}
@@ -116,6 +119,7 @@ pub fn Timeline::span(self : Timeline) -> Int64 {
 
 ///|
 /// One encoding of the presentation: a single quality a player can choose.
+#derive(Eq, Debug)
 pub(all) struct Representation {
   mut id : String
   mut bandwidth : Int32?
@@ -127,7 +131,7 @@ pub(all) struct Representation {
   mut audio_sampling_rate : Int32?
   mut base_url : String?
   mut template : Template?
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Representation with Eq::{equal, not_equal}
@@ -155,6 +159,7 @@ pub fn Representation::new(id : String, bandwidth? : Int32) -> Representation {
 ///|
 /// A group of representations a player chooses between: the video renditions of
 /// one period, or the audio ones.
+#derive(Eq, Debug)
 pub(all) struct AdaptationSet {
   mut id : Int32?
   mut content_type : String?
@@ -170,7 +175,7 @@ pub(all) struct AdaptationSet {
   mut base_url : String?
   mut template : Template?
   mut representations : Array[Representation]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend AdaptationSet with Eq::{equal, not_equal}
@@ -206,6 +211,7 @@ pub fn AdaptationSet::new(
 ///|
 /// A stretch of the presentation that is played on its own: a title, or the
 /// part of a live stream between two ad breaks.
+#derive(Eq, Debug)
 pub(all) struct Period {
   mut id : String?
   mut start : Double?
@@ -213,7 +219,7 @@ pub(all) struct Period {
   mut base_url : String?
   mut template : Template?
   mut adaptations : Array[AdaptationSet]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Period with Eq::{equal, not_equal}
@@ -237,6 +243,7 @@ pub fn Period::new(id? : String, start? : Double) -> Period {
 ///|
 /// A media presentation description: what a DASH client reads before it fetches
 /// anything.
+#derive(Eq, Debug)
 pub(all) struct Manifest {
   mut kind : Kind
   mut profiles : String?
@@ -249,7 +256,7 @@ pub(all) struct Manifest {
   mut suggested_delay : Double?
   mut base_url : String?
   mut periods : Array[Period]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Manifest with Eq::{equal, not_equal}

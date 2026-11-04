@@ -27,24 +27,26 @@ pub fn Packager::new(@mp4.Mp4, target_duration? : Double) -> Self raise @mp4.Mp4
 pub fn Packager::segments(Self) -> Array[Segment]
 pub fn Packager::video_track(Self) -> Track?
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Sample {
   data : Bytes
   dts : Int64
   duration : Int64
   composition_offset : Int64
   sync : Bool
-} derive(Eq, @debug.Debug)
+}
 pub fn Sample::equal(Self, Self) -> Bool
 pub fn Sample::not_equal(Self, Self) -> Bool
 pub fn Sample::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Segment {
   data : Bytes
   duration : Double
   start : Double
   keyframe : Bool
   samples : Array[Int32]
-} derive(Eq, @debug.Debug)
+}
 pub fn Segment::equal(Self, Self) -> Bool
 pub fn Segment::not_equal(Self, Self) -> Bool
 pub fn Segment::to_repr(Self) -> @debug.Repr
@@ -59,12 +61,13 @@ pub(all) struct Track {
   samples : Array[Sample]
 }
 
+#derive(Eq, @debug.Debug)
 pub(all) enum TrackKind {
   Video
   Audio
   Subtitle
   Other(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn TrackKind::equal(Self, Self) -> Bool
 pub fn TrackKind::not_equal(Self, Self) -> Bool
 pub fn TrackKind::to_repr(Self) -> @debug.Repr

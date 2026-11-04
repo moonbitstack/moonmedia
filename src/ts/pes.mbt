@@ -17,6 +17,7 @@ pub let audio_stream_base : Int32 = 0xC0
 /// needs and a dozen flags about how the frame may be decoded, which it does
 /// not; keeping the bytes means a packet read and written again is the same
 /// packet, and a caller that wants a timestamp reads it with `pts`.
+#derive(Eq, Debug)
 pub(all) struct Pes {
   stream_id : Int32
   /// The length the packet declares, header included. Zero means "until the
@@ -29,7 +30,7 @@ pub(all) struct Pes {
   /// The optional fields, verbatim: timestamps and the rarer flags.
   header : Bytes
   data : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Pes with Eq::{equal, not_equal}

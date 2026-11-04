@@ -3,11 +3,12 @@
 
 ///|
 /// The samples one track contributes to a fragment.
+#derive(Eq, Debug)
 pub(all) struct Run {
   track_id : Int32
   base_decode_time : Int64
   samples : Array[Sample]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Run with Eq::{equal, not_equal}
@@ -18,6 +19,7 @@ pub extend Run with @moonbitlang/core/debug.Debug::{to_repr}
 ///|
 /// One movie fragment: the `moof` that describes it and the media data that
 /// follows, up to the next fragment.
+#derive(Eq, Debug)
 pub(all) struct Fragment {
   sequence : Int32
   /// Offset of the `moof` in the file.
@@ -25,7 +27,7 @@ pub(all) struct Fragment {
   /// Offset just past the fragment's last byte.
   end : Int32
   runs : Array[Run]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Fragment with Eq::{equal, not_equal}
@@ -263,13 +265,14 @@ fn traf_runs(
 /// It says where the pieces of a fragmented stream are, in a form a player can
 /// read without downloading them, which is how a DASH client knows what to
 /// fetch next.
+#derive(Eq, Debug)
 pub(all) struct SegmentIndex {
   reference_id : Int32
   timescale : Int64
   earliest_presentation_time : Int64
   first_offset : Int64
   references : Array[IndexReference]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend SegmentIndex with Eq::{equal, not_equal}
@@ -280,6 +283,7 @@ pub extend SegmentIndex with @moonbitlang/core/debug.Debug::{to_repr}
 ///|
 /// One piece of a segment index: how big the next piece is and how long it
 /// plays, or a pointer to another index.
+#derive(Eq, Debug)
 pub(all) struct IndexReference {
   /// Whether this points at another index rather than at media.
   reference_type : Bool
@@ -289,7 +293,7 @@ pub(all) struct IndexReference {
   starts_with_sap : Bool
   sap_type : Int32
   sap_delta_time : Int64
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend IndexReference with Eq::{equal, not_equal}

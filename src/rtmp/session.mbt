@@ -3,6 +3,7 @@
 
 ///|
 /// Where a session is.
+#derive(Eq, Debug)
 pub(all) enum Phase {
   /// Waiting for the client's opening.
   Opening
@@ -14,7 +15,7 @@ pub(all) enum Phase {
   Publishing
   /// The stream ended.
   Closed
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Phase with Eq::{equal, not_equal}

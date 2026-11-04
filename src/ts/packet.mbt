@@ -46,10 +46,11 @@ pub impl Show for TsError with fn output(self, logger) {
 /// The field is kept as the bytes it was, because half of it is flags for
 /// features that are rare enough to be worth not modelling; the accessors read
 /// the parts that matter and a caller that needs more reads `raw`.
+#derive(Eq, Debug)
 pub(all) struct Adaptation {
   /// The field after its length byte, stuffing included.
   raw : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Adaptation with Eq::{equal, not_equal}
@@ -164,6 +165,7 @@ pub fn Adaptation::stuffing(self : Adaptation) -> Int32 {
 ///|
 /// One transport stream packet: a fixed 188 bytes, of which four or more are
 /// header, and the rest either adaptation field or payload.
+#derive(Eq, Debug)
 pub(all) struct Packet {
   /// The packet had an error crossing the network.
   error : Bool
@@ -177,7 +179,7 @@ pub(all) struct Packet {
   /// The payload as it sits in the packet, which for a partial packet is a
   /// piece of a unit and not the unit itself.
   payload : Bytes
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Packet with Eq::{equal, not_equal}

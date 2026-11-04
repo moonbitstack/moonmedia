@@ -19,6 +19,7 @@ pub fn MpdError::to_string(Self) -> String
 pub impl Show for MpdError
 
 // Types and methods
+#derive(Eq, @debug.Debug)
 pub(all) struct AdaptationSet {
   mut id : Int32?
   mut content_type : String?
@@ -34,23 +35,25 @@ pub(all) struct AdaptationSet {
   mut base_url : String?
   mut template : Template?
   mut representations : Array[Representation]
-} derive(Eq, @debug.Debug)
+}
 pub fn AdaptationSet::equal(Self, Self) -> Bool
 pub fn AdaptationSet::new(content_type? : String, mime_type? : String, lang? : String) -> Self
 pub fn AdaptationSet::not_equal(Self, Self) -> Bool
 pub fn AdaptationSet::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) enum Kind {
   Static
   Dynamic
   Other(String)
-} derive(Eq, @debug.Debug)
+}
 pub fn Kind::code(Self) -> String
 pub fn Kind::equal(Self, Self) -> Bool
 pub fn Kind::not_equal(Self, Self) -> Bool
 pub fn Kind::of(StringView) -> Self
 pub fn Kind::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Manifest {
   mut kind : Kind
   mut profiles : String?
@@ -63,7 +66,7 @@ pub(all) struct Manifest {
   mut suggested_delay : Double?
   mut base_url : String?
   mut periods : Array[Period]
-} derive(Eq, @debug.Debug)
+}
 pub fn Manifest::encode(Self) -> String
 pub fn Manifest::equal(Self, Self) -> Bool
 pub fn Manifest::new(kind? : Kind) -> Self
@@ -71,6 +74,7 @@ pub fn Manifest::not_equal(Self, Self) -> Bool
 pub fn Manifest::parse(StringView) -> Self raise MpdError
 pub fn Manifest::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Period {
   mut id : String?
   mut start : Double?
@@ -78,12 +82,13 @@ pub(all) struct Period {
   mut base_url : String?
   mut template : Template?
   mut adaptations : Array[AdaptationSet]
-} derive(Eq, @debug.Debug)
+}
 pub fn Period::equal(Self, Self) -> Bool
 pub fn Period::new(id? : String, start? : Double) -> Self
 pub fn Period::not_equal(Self, Self) -> Bool
 pub fn Period::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Representation {
   mut id : String
   mut bandwidth : Int32?
@@ -95,12 +100,13 @@ pub(all) struct Representation {
   mut audio_sampling_rate : Int32?
   mut base_url : String?
   mut template : Template?
-} derive(Eq, @debug.Debug)
+}
 pub fn Representation::equal(Self, Self) -> Bool
 pub fn Representation::new(String, bandwidth? : Int32) -> Self
 pub fn Representation::not_equal(Self, Self) -> Bool
 pub fn Representation::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Template {
   mut timescale : Int64?
   mut duration : Int64?
@@ -109,17 +115,18 @@ pub(all) struct Template {
   mut initialization : String?
   mut media : String?
   mut timeline : Array[Timeline]
-} derive(Eq, @debug.Debug)
+}
 pub fn Template::equal(Self, Self) -> Bool
 pub fn Template::new() -> Self
 pub fn Template::not_equal(Self, Self) -> Bool
 pub fn Template::to_repr(Self) -> @debug.Repr
 
+#derive(Eq, @debug.Debug)
 pub(all) struct Timeline {
   mut time : Int64?
   mut duration : Int64
   mut repeat : Int32
-} derive(Eq, @debug.Debug)
+}
 pub fn Timeline::equal(Self, Self) -> Bool
 pub fn Timeline::new(Int64, repeat? : Int32, time? : Int64) -> Self
 pub fn Timeline::not_equal(Self, Self) -> Bool

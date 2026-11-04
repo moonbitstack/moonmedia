@@ -3,13 +3,14 @@
 
 ///|
 /// What a track carries, from the handler `hdlr` names.
+#derive(Eq, Debug)
 pub(all) enum TrackKind {
   Video
   Audio
   Subtitle
   Hint
   Other(String)
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend TrackKind with Eq::{equal, not_equal}
@@ -79,11 +80,12 @@ pub fn Mp4::is_fragmented(self : Mp4) -> Bool {
 
 ///|
 /// The brands a file declares in `ftyp`.
+#derive(Eq, Debug)
 pub(all) struct FileType {
   major : String
   minor : Int32
   compatible : Array[String]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend FileType with Eq::{equal, not_equal}
@@ -125,10 +127,11 @@ pub fn FileType::encode(self : FileType) -> Bytes {
 
 ///|
 /// A track's timescale: how many units make a second.
+#derive(Eq, Debug)
 pub(all) struct MovieHeader {
   timescale : Int64
   duration : Int64
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend MovieHeader with Eq::{equal, not_equal}
@@ -157,6 +160,7 @@ pub fn movie_header(moov : Box) -> MovieHeader raise Mp4Error {
 ///|
 /// One sample: where its bytes are, when it plays, and whether a player may
 /// start here.
+#derive(Eq, Debug)
 pub(all) struct Sample {
   /// Offset into the file.
   offset : Int32
@@ -167,7 +171,7 @@ pub(all) struct Sample {
   /// How far presentation time runs ahead of decode time, for reordered video.
   composition_offset : Int64
   sync : Bool
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Sample with Eq::{equal, not_equal}
@@ -190,6 +194,7 @@ pub fn Sample::seconds(self : Sample, timescale : Int64) -> Double {
 ///|
 /// A track and the samples it holds, read from the sample table or from the
 /// fragments.
+#derive(Eq, Debug)
 pub(all) struct Track {
   id : Int32
   kind : TrackKind
@@ -203,7 +208,7 @@ pub(all) struct Track {
   sample_rate : Int32
   channels : Int32
   samples : Array[Sample]
-} derive(Eq, Debug)
+}
 
 ///|
 pub extend Track with Eq::{equal, not_equal}

@@ -167,3 +167,145 @@ test "panic: a file with no movie header cannot be cut" {
   )
   @moonmedia.Packager::new(file) |> ignore
 }
+
+///|
+test "a packaged stream reads back as a fragmented file and cuts the same way" {
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let first = @moonmedia.Packager::new(file, target_duration=0.3)
+  // What a player does: the initialisation section, then the segments in order.
+  let buf = @buffer.Buffer()
+  buf.write_bytes(first.init_segment())
+  for segment in first.segments() {
+    buf.write_bytes(segment.data)
+  }
+  let joined = buf.contents()
+  let repackaged = @mp4.Mp4::parse(joined[:])
+  assert_eq(repackaged.is_fragmented(), true)
+  let samples = file.tracks().map(fn(track) { track.samples.length() })
+  assert_eq(
+    repackaged.tracks().map(fn(track) { track.samples.length() }),
+    samples,
+  )
+  // Cutting it again gives the segments it was cut into, byte for byte.
+  let second = @moonmedia.Packager::new(repackaged, target_duration=0.3)
+  assert_eq(second.segments().length(), first.segments().length())
+  for i, segment in second.segments() {
+    assert_eq(segment.data, first.segments()[i].data)
+    assert_eq(segment.start, first.segments()[i].start)
+    assert_eq(segment.duration, first.segments()[i].duration)
+  }
+}
+
+///|
+test "the packaged stream lasts as long as the segments it was cut into" {
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let packager = @moonmedia.Packager::new(file, target_duration=0.3)
+  let mut total = 0.0
+  for segment in packager.segments() {
+    total = total + segment.duration
+  }
+  assert_true(total > 0.0)
+  assert_eq(packager.duration(), total)
+}
+
+///|
+test "the media playlist can be served from a prefix" {
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let packager = @moonmedia.Packager::new(file, target_duration=0.3)
+  let playlist = packager.media_playlist(
+    prefix="media/",
+    init_name="header.mp4",
+  )
+  assert_eq(playlist.segments[0].uri, "media/segment0.m4s")
+  assert_eq(playlist.segments[0].map.unwrap().uri, "media/header.mp4")
+  // Every segment names the same initialisation section, and a player reading
+  // the playlist back gets the names that were written.
+  for segment in playlist.segments {
+    assert_eq(segment.map.unwrap().uri, "media/header.mp4")
+  }
+  assert_eq(@m3u8.Playlist::parse(playlist.encode()).media().unwrap(), playlist)
+}
+
+///|
+test "the master playlist keeps the bandwidth and the name it is given" {
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let packager = @moonmedia.Packager::new(file)
+  let master = packager.master_playlist(uri="index.m3u8", bandwidth=800_000)
+  assert_eq(master.variants.length(), 1)
+  assert_eq(master.variants[0].uri, "index.m3u8")
+  assert_eq(master.variants[0].bandwidth, Some(800_000))
+  assert_true(master.encode().contains("#EXT-X-STREAM-INF:BANDWIDTH=800000"))
+}
+
+///|
+/// Eight frames of a 64 x 64 test pattern, 250 ms apart, with a key frame only
+/// at the first and the fifth: a group of pictures longer than the target
+/// duration, so a cut has to wait for the second key frame.
+let gop_movie : String =
+  #|AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAJqbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAA
+  #|AAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAA
+  #|AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAfZ0cmFrAAAAXHRraGQAAAAHAAAAAAAAAAAAAAAB
+  #|AAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAA
+  #|AEAAAABAAAAAAAGSbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAyAAAAB9BVxAAAAAAALWhkbHIAAAAA
+  #|AAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAA
+  #|AAAAASFzdGJsAAAAhXN0c2QAAAAAAAAAAQAAAHVhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAA
+  #|QABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAH2F2Y0MB
+  #|QsAK/+EACWdCwArZAPA8AQAEaM48gAAAABhzdHRzAAAAAAAAAAEAAAAIAAAMgAAAABxzdHNjAAAAAAAA
+  #|AAEAAAABAAAACAAAAAEAAAA0c3RzegAAAAAAAAAAAAAACAAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAA
+  #|AAUAAAAFAAAAGHN0c3MAAAAAAAAAAgAAAAEAAAAFAAAAFHN0Y28AAAAAAAAAAQAAApIAAAAwbWRhdAAA
+  #|AAFlAAAAAUEAAAABQQAAAAFBAAAAAWUAAAABQQAAAAFBAAAAAUE=
+
+///|
+test "a cut never falls inside a group of pictures" {
+  let file = @mp4.Mp4::parse(
+    @base64.decode(gop_movie, ignore_whitespace=true)[:],
+  )
+  let packager = @moonmedia.Packager::new(file, target_duration=0.3)
+  // The nearest key frame is one second away, so each segment lasts a second
+  // even though the target is 0.3.
+  assert_eq(packager.segments().length(), 2)
+  for segment in packager.segments() {
+    assert_eq(segment.duration, 1.0)
+    let fragment = @mp4.Mp4::parse(segment.data).fragments()[0]
+    assert_eq(fragment.runs[0].samples[0].sync, true)
+  }
+}
+
+///|
+test "the media playlist is a complete one of independent segments" {
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let packager = @moonmedia.Packager::new(file, target_duration=0.3)
+  let text = packager.media_playlist().encode()
+  // A file that has an end is a VOD playlist, and every segment begins on a key
+  // frame, which is what lets a player switch rendition between them.
+  assert_true(text.contains("#EXT-X-PLAYLIST-TYPE:VOD\n"))
+  assert_true(text.contains("#EXT-X-INDEPENDENT-SEGMENTS\n"))
+  assert_true(text.has_suffix("#EXT-X-ENDLIST\n"))
+  assert_true(packager.master_playlist().independent_segments)
+}
+
+///|
+test "the initialisation section describes the codec and claims no frames" {
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let packager = @moonmedia.Packager::new(file, target_duration=0.3)
+  let init = @mp4.Mp4::parse(packager.init_segment())
+  let moov = init.movie().unwrap()
+  // A stream still being written does not know how long it is: each fragment
+  // says when it starts, and the header says nothing.
+  assert_eq(@mp4.movie_header(moov).duration, 0L)
+  assert_true(moov.child("mvex") != None)
+  // The sample description stays, because a player needs the codec; every table
+  // that describes frames is gone.
+  let trak = moov.children_of("trak")[0]
+  let stbl = trak
+    .child("mdia")
+    .unwrap()
+    .child("minf")
+    .unwrap()
+    .child("stbl")
+    .unwrap()
+  assert_eq(stbl.boxes().map(fn(box) { box.type_ }), ["stsd"])
+  for track in init.tracks() {
+    assert_eq(track.samples.length(), 0)
+  }
+}

@@ -97,17 +97,18 @@ this segment" does not have to replay the file to find out.</p><div class="code"
     #|#EXTINF:4.004,
     #|segment1.m4s
     #|#EXT-X-ENDLIST
-  match @m3u8.Playlist::parse(text) {
-    MediaPlaylist(media) =&gt; {
-      println("target: " + media.target_duration.to_string() + " s")
-      for segment in media.segments {
-        println(segment.uri + " " + segment.duration.to_string())
-      }
-    }
-    MasterPlaylist(master) =&gt;
-      println("variants: " + master.variants.length().to_string())
+  let playlist = @m3u8.Playlist::parse(text)
+  println(if playlist.is_master() { "master" } else { "media" })
+  let media = playlist.media().unwrap()
+  println("target: " + media.target_duration.to_string() + " s")
+  // The map in force for a segment is resolved for you.
+  println("map: " + media.segments[0].map.unwrap().uri)
+  for segment in media.segments {
+    println(segment.uri + " " + segment.duration.to_string())
   }
-}</pre></div><div class="out">target: 6 s
+}</pre></div><div class="out">media
+target: 6 s
+map: init.mp4
 segment0.m4s 6
 segment1.m4s 4.004</div><p>Writing goes the other way: build the model, then encode it. An empty media
 playlist takes the target duration, because every other tag can be defaulted
@@ -194,37 +195,42 @@ does not have to know which kind of file it opened.</p>
 <p><code>Packager</code> takes a parsed movie and returns what a player asks
 for: one initialisation section, then one fragment per key frame interval. The
 audio that falls in an interval travels with the video that starts it.</p>
-<p>The bytes below come from a file the caller already has. This is the one
-snippet on this page that is not a test: a movie is not something a test can
-invent, so the step that reads one is left out.</p><!-- nocheck -->
-<div class="code"><span class="label">moonbit</span><pre>// `movie` is a file's bytes, from wherever the caller got them.
-let file = @mp4.Mp4::parse(movie)
-let packager = @moonmedia.Packager::new(file, target_duration=0.6)
-let init = packager.init_segment()
-for i, segment in packager.segments() {
-  println("segment" + i.to_string() + ".m4s " + segment.duration.to_string() +
-    " s " + segment.data.length().to_string() + " bytes")
-}
-println(packager.media_playlist().encode())
-println(packager.master_playlist(uri="index.m3u8").encode())</pre></div><div class="out">init 1137 bytes
-segment0.m4s 0.6 s 8755 bytes
-segment1.m4s 0.6 s 8800 bytes
+<p>The file below is 698 bytes of a 64 × 64 test pattern: eight frames, four
+hundred milliseconds apart, the first and the fifth of them key frames. A
+caller passes whatever bytes it has; this page carries one so that the block
+runs as written.</p>
+<div class="code"><span class="label">moonbit</span><pre>test {
+  let movie =
+    #|AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAJqbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAfZ0cmFrAAAAXHRraGQAAAAHAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAGSbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAyAAAAB9BVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAASFzdGJsAAAAhXN0c2QAAAAAAAAAAQAAAHVhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAH2F2Y0MBQsAK/+EACWdCwArZAPA8AQAEaM48gAAAABhzdHRzAAAAAAAAAAEAAAAIAAAMgAAAABxzdHNjAAAAAAAAAAEAAAABAAAACAAAAAEAAAA0c3RzegAAAAAAAAAAAAAACAAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAAGHN0c3MAAAAAAAAAAgAAAAEAAAAFAAAAFHN0Y28AAAAAAAAAAQAAApIAAAAwbWRhdAAAAAFlAAAAAUEAAAABQQAAAAFBAAAAAWUAAAABQQAAAAFBAAAAAUE=
+  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let packager = @moonmedia.Packager::new(file, target_duration=0.5)
+  let init = packager.init_segment()
+  println("init " + init.length().to_string() + " bytes")
+  for i, segment in packager.segments() {
+    println("segment" + i.to_string() + ".m4s " + segment.duration.to_string() +
+      " s " + segment.data.length().to_string() + " bytes")
+  }
+  println(packager.media_playlist().encode())
+  println(packager.master_playlist(uri="index.m3u8").encode())
+}</pre></div><div class="out">init 542 bytes
+segment0.m4s 1 s 180 bytes
+segment1.m4s 1 s 180 bytes
 #EXTM3U
 #EXT-X-VERSION:7
 #EXT-X-TARGETDURATION:1
 #EXT-X-PLAYLIST-TYPE:VOD
 #EXT-X-INDEPENDENT-SEGMENTS
 #EXT-X-MAP:URI="init.mp4"
-#EXTINF:0.6,
+#EXTINF:1,
 segment0.m4s
-#EXTINF:0.6,
+#EXTINF:1,
 segment1.m4s
 #EXT-X-ENDLIST
 
 #EXTM3U
 #EXT-X-VERSION:7
 #EXT-X-INDEPENDENT-SEGMENTS
-#EXT-X-STREAM-INF:BANDWIDTH=117033,CODECS="avc1.42c00a,mp4a.40.2",RESOLUTION=64x64
+#EXT-X-STREAM-INF:BANDWIDTH=1440,CODECS="avc1.42c00a",RESOLUTION=64x64
 index.m3u8</div><p>Each segment is a movie fragment of its own: a <code>moof</code> and the
 <code>mdat</code> it points at, so a player can fetch one without the others.
 The initialisation section is <code>ftyp</code> and <code>moov</code>, with

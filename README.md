@@ -56,8 +56,10 @@ The packager reads a whole MP4 — progressive or already fragmented — and ret
 an initialisation section plus one segment per key frame interval. Nothing is
 written anywhere: the bytes are handed back for a caller to serve.
 
-The file below is 698 bytes of a 64 × 64 test pattern: eight frames at four
-hundred milliseconds each, the first and the fifth of them key frames.
+The file below is 698 bytes of a 64 × 64 test pattern: eight frames a quarter
+of a second apart, the first and the fifth of them key frames. The target is
+half a second, but a segment may only begin on a key frame, so the cut lands on
+the fifth frame and each segment lasts a second.
 
 ```moonbit
 let packed =

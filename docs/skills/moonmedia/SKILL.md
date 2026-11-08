@@ -65,7 +65,7 @@ rather than being dropped.
 
 `Packager` takes a parsed movie — progressive or already fragmented — and returns the initialisation
 section plus one segment per key frame interval, each with the audio that plays over it. The file
-below is 698 bytes of a 64 × 64 test pattern, eight frames 400 ms apart, the first and the fifth of
+below is 698 bytes of a 64 × 64 test pattern, eight frames 250 ms apart, the first and the fifth of
 them key frames; a real caller passes whatever bytes it has.
 
 ```mbt check

@@ -1,0 +1,8 @@
+// A movie in, the files a server would answer with out, written as JSON.
+pkgtype(kind: "executable")
+
+import {
+  "moonbitlang/core/encoding/base64",
+  "moonbitstack/moonmedia",
+  "moonbitstack/moonmedia/mp4",
+}

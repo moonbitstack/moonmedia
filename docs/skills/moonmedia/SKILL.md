@@ -101,6 +101,35 @@ segment can be longer or shorter than the target and a player seeking into one s
 something it can decode. Writing the segments out and answering requests for them is the caller's
 job; `Packager::media_playlist(prefix=, init_name=)` decides what names the playlist uses.
 
+## Address the segments of a manifest
+
+A DASH manifest says where its segments are in one of three ways, and all three
+are read and written: a template with numbers in it, a list of URLs, and one
+file with a byte range per segment. Expanding a template is not string
+interpolation — the padding in `$Number%05d$` is part of the name a player asks
+for.
+
+```mbt check
+test {
+  let template = @mpd.Template::new()
+  template.timescale = Some(16384L)
+  template.duration = Some(8192L)
+  template.initialization = Some("init-$RepresentationID$.m4s")
+  template.media = Some("chunk-$RepresentationID$-$Number%05d$.m4s")
+  assert_eq(template.segment_url(number=7L, representation_id="v0"), "chunk-v0-00007.m4s")
+  assert_eq(template.count(1.0), 2)
+
+  let base = @mpd.SegmentBase::new()
+  base.index_range = @mpd.Range::of("1409-1476")
+  assert_eq(base.index_range.unwrap().length(), Some(68L))
+}
+```
+
+`SegmentList` is the same information one segment at a time, and `SegmentBase`
+is the on-demand profile: one file, an index a player reads first, and an
+initialisation range. Both carry `Range` values, which keep the written form
+`start-end` and count the end.
+
 ## Read a transport stream
 
 A transport stream is 188-byte packets. `parse` takes them as they are — adaptive field stuffing,
@@ -175,6 +204,9 @@ test {
 - **Times stay in the format's units.** A container keeps integer ticks in the track's timescale and
   a playlist or a manifest writes seconds as the shortest text that reads back the same. Convert at
   the edge, not in the middle.
+- **A track has two clocks.** Sample times are on the media's timeline; `Track::edit_time` says where
+  presentation starts, which is how a codec's priming samples stay in the file but out of the sound.
+  Subtract it before showing a time to a user.
 - **Unknown is kept.** Later-revision playlist tags, boxes with no name here, and chunk headers this
   release does not use all survive a read-and-write. Do not expect the bytes to match the input where
   the format allows more than one spelling — compare models, or assert on the fields.

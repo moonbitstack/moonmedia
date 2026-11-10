@@ -28,7 +28,8 @@ cut and repackaged without a socket or a file anywhere in the library.
   elementary streams inside them and the clock that times them.
 - **`rtmp`** — the publish side: handshake, chunk stream, commands, and the state
   machine a publisher drives.
-- **`mpd`** — DASH manifests, read into a model and written back as XML.
+- **`mpd`** — DASH manifests, read into a model and written back as XML, with
+  all three ways a manifest addresses a segment.
 - **`moonmedia`** — the packager that ties them together: an MP4 in, key-frame
   segments and the playlists that name them out.
 
@@ -41,7 +42,7 @@ program that only needs HLS playlists does not carry a container parser with it.
 | `moonbitstack/moonmedia/m3u8` | HLS master and media playlists, low-latency additions | [RFC 8216](https://www.rfc-editor.org/rfc/rfc8216) |
 | `moonbitstack/moonmedia/ts` | MPEG-TS packets, PAT, PMT, PES, PCR | ISO/IEC 13818-1 |
 | `moonbitstack/moonmedia/rtmp` | RTMP handshake, chunks, AMF0, publish session | Adobe RTMP 1.0 |
-| `moonbitstack/moonmedia/mpd` | DASH MPD: periods, adaptation sets, templates, timelines | ISO/IEC 23009-1 |
+| `moonbitstack/moonmedia/mpd` | DASH MPD: periods, adaptation sets, templates, timelines, lists, byte ranges | ISO/IEC 23009-1 |
 | `moonbitstack/moonmedia` | MP4 to HLS: segments, media playlist, master playlist | — |
 
 ## Install
@@ -92,6 +93,15 @@ assert_eq(video.samples[1].sync, false)
 // package has no name for.
 assert_eq(file.encode(), movie)
 ```
+
+A track's samples are counted in the media's own clock, which is not always the
+clock a player shows them by: an encoder that primes its decoder leaves those
+priming samples in the file and asks for the presentation to start later. That
+is an edit list, and `Track::edit_time` reports where presentation begins so the
+two clocks can be told apart — subtract it from a sample's decode time to get the
+instant the sample is played at. The packager keeps the edit list in the
+initialisation section for the same reason, so a packaged stream starts its sound
+where the source did.
 
 Cutting is one call on that file. Segments start on video key frames and carry
 the audio that plays over them, so a player that seeks or switches rendition
@@ -328,6 +338,50 @@ assert_eq(@mpd.parse_duration("PT1H2M3.5S"), Some(3723.5))
 assert_eq(@mpd.format_duration(3723.5), "PT1H2M3.5S")
 ```
 
+A manifest addresses its segments one of three ways, and all three are read and
+written: a template with the numbers filled in, a list of URLs, and a single file
+with a byte range per segment. Filling a template in is the library's job
+because the padding is part of the name — `$Number%05d$` is five digits, and a
+player asking for `chunk-1.m4s` gets nothing.
+
+```moonbit
+let address = @mpd.Template::new()
+address.timescale = Some(16384L)
+address.duration = Some(8192L)
+address.start_number = Some(1L)
+address.initialization = Some("init-$RepresentationID$.m4s")
+address.media = Some("chunk-$RepresentationID$-$Number%05d$.m4s")
+assert_eq(address.segment_url(number=7L, representation_id="v0"), "chunk-v0-00007.m4s")
+assert_eq(address.initialization_url(representation_id="v0"), "init-v0.m4s")
+// A template with one duration repeats it until the presentation ends.
+assert_eq(address.count(1.0), 2)
+```
+
+A list says the same thing one segment at a time, and a base says it once for a
+whole file. Both are what a packager writing one file per rendition produces, so
+reading them back is what lets a manifest be rewritten rather than only parsed.
+
+```moonbit
+let list = @mpd.SegmentList::new()
+list.timescale = Some(16384L)
+list.duration = Some(8192L)
+let header = @mpd.Initialization::new(source_url="all.mp4")
+header.range = @mpd.Range::of("0-1380")
+list.initialization = Some(header)
+let first = @mpd.SegmentUrl::new()
+first.media_range = @mpd.Range::of("1389-15304")
+list.urls.push(first)
+assert_eq(list.length(), 1)
+assert_eq(list.urls[0].media_range.unwrap().length(), Some(13916L))
+
+let base = @mpd.SegmentBase::new()
+base.index_range = @mpd.Range::of("1409-1476")
+base.index_range_exact = Some(true)
+base.initialization = Some(@mpd.Initialization::new())
+base.initialization.unwrap().range = @mpd.Range::of("0-1380")
+assert_eq(base.index_range.unwrap().start, 1409L)
+```
+
 ## How the packages behave
 
 **Bytes in, bytes out.** Nothing here opens a socket, reads a file or keeps
@@ -370,6 +424,9 @@ playlist is the shortest text that reads back as the same number.
 | `Box::children(type, boxes)`, `Box::bytes(type, raw)`, `Box::byte_length()` | building a tree |
 | `segment_index(box)` | a `sidx` read into references |
 | `Sample`, `Track`, `Fragment`, `Run`, `SegmentIndex`, `FileType`, `MovieHeader` | the data shapes |
+
+A `Track` reports `edit_time`: the media time at which presentation starts, `0`
+when the track has no edit list.
 
 ### `moonbitstack/moonmedia/m3u8`
 
@@ -418,6 +475,9 @@ playlist is the shortest text that reads back as the same number.
 | `Manifest::parse(text)`, `Manifest::encode()` | a manifest in and out |
 | `Manifest`, `Period`, `AdaptationSet`, `Representation` | the model |
 | `Template`, `Timeline` | how segments are addressed |
+| `Template::segment_url(...)`, `Template::initialization_url(...)` | a name with the numbers filled in |
+| `Template::count(seconds)` | how many segments a template addresses |
+| `SegmentList`, `SegmentUrl`, `SegmentBase`, `Initialization`, `Range` | the other two ways to address a segment |
 | `parse_duration(text)`, `format_duration(seconds)` | ISO 8601 durations |
 | `Kind` | static or dynamic |
 
@@ -442,7 +502,32 @@ moon run src/examples/03-package     # an MP4 cut into segments, with the playli
 moon run src/examples/04-transport   # tables and a frame, as transport stream packets
 moon run src/examples/05-manifest    # a DASH manifest, printed as XML
 moon run src/examples/06-ingest      # a publish session driven from handshake to media
+moon run src/examples/07-emit-package  # a package as JSON, for a server or a script to write
 ```
+
+## Conformance
+
+Every format here is read from bytes another implementation wrote, and the
+reading is compared with a probe's:
+
+- **Where the bytes come from.** ffmpeg 8.1.1 and GPAC (MP4Box) 2.4 mux a
+  one-second clip into an ISO base media file, a fragmented file, an MPEG-TS
+  stream, a CMAF segment pair, HLS playlists and DASH manifests. MP4Box also
+  writes the on-demand profile, where a whole rendition is one file addressed by
+  byte range. `scripts/gen_vectors.py` makes all of it and records the commands.
+- **What is compared.** ffprobe's reading of the same file — sample counts,
+  decode times, key frames, elementary bytes, the length of the presentation —
+  is written beside each payload, and the tests render this library's model the
+  same way and compare the two line for line. Template expansion is checked
+  against the file names the packager left on disk.
+- **The other direction.** What the packager makes of a movie is written out as
+  an HLS package and handed to ffmpeg: the frame counts, the key frame positions
+  and the length ffmpeg reads agree with the packager's, and ffmpeg decodes every
+  frame of both streams through the media playlist, the master playlist and the
+  joined fragmented file.
+
+All of it passes, and nothing is left out of the comparison: every payload the
+generator writes is replayed, and every stream the packager cuts is played back.
 
 ## Licence
 

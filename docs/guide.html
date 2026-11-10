@@ -69,6 +69,7 @@
       <a href="#transport">Transport streams</a>
       <a href="#ingest">Ingest a publish stream</a>
       <a href="#manifest">DASH manifests</a>
+      <a href="#checked">Checked against others</a>
       <a href="#limits">Where the library stops</a>
     </nav>
     <article class="prose">
@@ -189,6 +190,11 @@ serving byte ranges needs both.</p>
 fragments when it has those instead — a file written by a packager and a file
 written by an encoder both come back as tracks with samples, and the caller
 does not have to know which kind of file it opened.</p>
+<p>The times on those samples are the media's, and a track says where the
+presentation starts with <code>edit_time</code>. An encoder that primes its
+decoder leaves the priming samples in the file and asks a player to begin
+later; subtract <code>edit_time</code> from a sample's decode time and the
+result is the instant it is played at.</p>
     </section>
     <section id="package">
       <h2>Cut a movie into HLS</h2>
@@ -358,6 +364,58 @@ read back: 1 period</div><p>Durations are handled as the format writes them: <co
 two seconds, <code>PT1H2M3.5S</code> as an hour, two minutes and three and a
 half seconds, and a value that is not a duration is an error rather than a
 silent zero.</p>
+<p>A manifest addresses its segments one of three ways: a template with the
+numbers filled in, a list of URLs, or one file with a byte range per segment.
+Filling a template in is the library's job, because the padding is part of the
+name. A list and a base are what a packager produces when it writes a whole
+rendition into one file, and both are read into byte ranges a player can ask
+for.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let template = @mpd.Template::new()
+  template.timescale = Some(16384L)
+  template.duration = Some(8192L)
+  template.initialization = Some("init-$RepresentationID$.m4s")
+  template.media = Some("chunk-$RepresentationID$-$Number%05d$.m4s")
+  println(template.segment_url(number=7L, representation_id="v0"))
+  println(template.initialization_url(representation_id="v0"))
+  println("segments in one second: " + template.count(1.0).to_string())
+
+  let base = @mpd.SegmentBase::new()
+  base.index_range = @mpd.Range::of("1409-1476")
+  base.index_range_exact = Some(true)
+  let header = @mpd.Initialization::new()
+  header.range = @mpd.Range::of("0-1380")
+  base.initialization = Some(header)
+  println("index " + base.index_range.unwrap().text() + ", " +
+    base.index_range.unwrap().length().unwrap().to_string() + " bytes")
+  println("init " + base.initialization.unwrap().range.unwrap().text())
+
+  let list = @mpd.SegmentList::new()
+  list.timescale = Some(16384L)
+  list.duration = Some(8192L)
+  let first = @mpd.SegmentUrl::new()
+  first.media_range = @mpd.Range::of("1389-15304")
+  list.urls.push(first)
+  println("a list of " + list.length().to_string() + " segment, " +
+    list.urls[0].media_range.unwrap().length().unwrap().to_string() + " bytes")
+}</pre></div><div class="out">chunk-v0-00007.m4s
+init-v0.m4s
+segments in one second: 2
+index 1409-1476, 68 bytes
+init 0-1380
+a list of 1 segment, 13916 bytes</div>
+    </section>
+    <section id="checked">
+      <h2>Checked against other implementations</h2>
+<p>The bytes this library reads in its examples are bytes other programs
+wrote: ffmpeg's muxers and GPAC's packager. Each format is replayed from a
+payload one of them produced, and the reading is compared line for line with
+what a probe says about the same file — sample counts, decode times, key
+frames, the elementary bytes of a stream, the length of the presentation.</p>
+<p>The other direction is checked too. A movie is packaged into HLS, the
+segments and playlists are written out as a server would hold them, and a
+player is asked to play the result: the frame counts, the key frame positions
+and the length it reads agree with what the packager said it made, and every
+frame of both streams decodes.</p>
     </section>
     <section id="limits">
       <h2>Where the library stops</h2>

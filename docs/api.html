@@ -67,7 +67,7 @@
           <a href="#mp4" title="ISO base media">mp4<span>55</span></a>
           <a href="#ts" title="MPEG-TS">ts<span>57</span></a>
           <a href="#rtmp" title="RTMP">rtmp<span>59</span></a>
-          <a href="#mpd" title="DASH">mpd<span>22</span></a>
+          <a href="#mpd" title="DASH">mpd<span>39</span></a>
           <a href="#moonmedia" title="Packager">moonmedia<span>13</span></a>
       </nav>
     </aside>
@@ -1552,11 +1552,26 @@ data.</em></li>
           <li><b>mut audio_sampling_rate</b><span>Int32?</span></li>
           <li><b>mut base_url</b><span>String?</span></li>
           <li><b>mut template</b><span>Template?</span></li>
+          <li><b>mut segment_list</b><span>SegmentList?</span></li>
+          <li><b>mut segment_base</b><span>SegmentBase?</span></li>
           <li><b>mut representations</b><span>Array[Representation]</span></li>
         </ul>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> AdaptationSet::new(content_type? : String, mime_type? : String, lang? : String) -&gt; AdaptationSet</code>
           <div class="doc"><p>A set carrying <code>content_type</code>, <code>mime_type</code> and a language.</p></div>
+        </div>
+      </div>
+      <div class="entry">
+        <span class="kind">struct</span>
+        <code class="sig"><span class="kw">pub(all) struct</span> Initialization</code>
+        <div class="doc"><p>Where the initialisation segment is: a URL, a range inside one, or both.</p></div>
+        <ul class="fields">
+          <li><b>mut source_url</b><span>String?</span></li>
+          <li><b>mut range</b><span>Range?</span></li>
+        </ul>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Initialization::new(source_url? : String) -&gt; Initialization</code>
+          <div class="doc"><p>An initialisation section at <code>source_url</code>, with nothing else set.</p></div>
         </div>
       </div>
       <div class="entry">
@@ -1630,11 +1645,39 @@ data.</em></li>
           <li><b>mut duration</b><span>Double?</span></li>
           <li><b>mut base_url</b><span>String?</span></li>
           <li><b>mut template</b><span>Template?</span></li>
+          <li><b>mut segment_list</b><span>SegmentList?</span></li>
+          <li><b>mut segment_base</b><span>SegmentBase?</span></li>
           <li><b>mut adaptations</b><span>Array[AdaptationSet]</span></li>
         </ul>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Period::new(id? : String, start? : Double) -&gt; Period</code>
           <div class="doc"><p>A period that starts at <code>start</code> seconds.</p></div>
+        </div>
+      </div>
+      <div class="entry">
+        <span class="kind">struct</span>
+        <code class="sig"><span class="kw">pub(all) struct</span> Range</code>
+        <div class="doc"><p>A range of bytes in a file, as a manifest writes it: <code>1389-15304</code>, both ends counted.</p>
+<p>The end may be left out, which means "to the end of the file".</p></div>
+        <ul class="fields">
+          <li><b>mut start</b><span>Int64</span></li>
+          <li><b>mut end</b><span>Int64?</span></li>
+        </ul>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Range::length(self : Range) -&gt; Int64?</code>
+          <div class="doc"><p>How many bytes the range covers, when its end is known.</p></div>
+        </div>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Range::new(start : Int64, end? : Int64) -&gt; Range</code>
+          <div class="doc"><p>A range starting at <code>start</code>, ending at <code>end</code> when there is one.</p></div>
+        </div>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Range::of(text : StringView) -&gt; Range?</code>
+          <div class="doc"><p>The range a written value names, <code>start-end</code> or <code>start-</code>.</p></div>
+        </div>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Range::text(self : Range) -&gt; String</code>
+          <div class="doc"><p>The text a range is written as.</p></div>
         </div>
       </div>
       <div class="entry">
@@ -1652,10 +1695,65 @@ data.</em></li>
           <li><b>mut audio_sampling_rate</b><span>Int32?</span></li>
           <li><b>mut base_url</b><span>String?</span></li>
           <li><b>mut template</b><span>Template?</span></li>
+          <li><b>mut segment_list</b><span>SegmentList?</span></li>
+          <li><b>mut segment_base</b><span>SegmentBase?</span></li>
         </ul>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Representation::new(id : String, bandwidth? : Int32) -&gt; Representation</code>
           <div class="doc"><p>A representation of <code>id</code> costing <code>bandwidth</code> bits per second.</p></div>
+        </div>
+      </div>
+      <div class="entry">
+        <span class="kind">struct</span>
+        <code class="sig"><span class="kw">pub(all) struct</span> SegmentBase</code>
+        <div class="doc"><p>A single file addressed by byte ranges, with an index a player reads first.</p>
+<p>The on-demand profile: one request for the index tells a player where every segment is, so it can fetch the ones it needs without the others.</p></div>
+        <ul class="fields">
+          <li><b>mut timescale</b><span>Int64?</span></li>
+          <li><b>mut presentation_time_offset</b><span>Int64?</span></li>
+          <li><b>mut index_range</b><span>Range?</span></li>
+          <li><b>mut index_range_exact</b><span>Bool?</span></li>
+          <li><b>mut initialization</b><span>Initialization?</span></li>
+        </ul>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> SegmentBase::new() -&gt; SegmentBase</code>
+          <div class="doc"><p>A segment base with nothing set.</p></div>
+        </div>
+      </div>
+      <div class="entry">
+        <span class="kind">struct</span>
+        <code class="sig"><span class="kw">pub(all) struct</span> SegmentList</code>
+        <div class="doc"><p>Segments written out one by one, each with its own URL or its own range.</p>
+<p>This is how a packager addresses a stream it wrote into a single file: the manifest lists where each piece starts and ends, so a player fetches a range instead of a file.</p></div>
+        <ul class="fields">
+          <li><b>mut timescale</b><span>Int64?</span></li>
+          <li><b>mut duration</b><span>Int64?</span></li>
+          <li><b>mut start_number</b><span>Int64?</span></li>
+          <li><b>mut presentation_time_offset</b><span>Int64?</span></li>
+          <li><b>mut initialization</b><span>Initialization?</span></li>
+          <li><b>mut urls</b><span>Array[SegmentUrl]</span></li>
+        </ul>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> SegmentList::length(self : SegmentList) -&gt; Int32</code>
+          <div class="doc"><p>How many segments the list holds.</p></div>
+        </div>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> SegmentList::new() -&gt; SegmentList</code>
+          <div class="doc"><p>A list with nothing in it.</p></div>
+        </div>
+      </div>
+      <div class="entry">
+        <span class="kind">struct</span>
+        <code class="sig"><span class="kw">pub(all) struct</span> SegmentUrl</code>
+        <div class="doc"><p>One segment of a list: the whole file, or a range inside the file the representation's base URL names.</p></div>
+        <ul class="fields">
+          <li><b>mut media</b><span>String?</span></li>
+          <li><b>mut media_range</b><span>Range?</span></li>
+          <li><b>mut index_range</b><span>Range?</span></li>
+        </ul>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> SegmentUrl::new(media? : String) -&gt; SegmentUrl</code>
+          <div class="doc"><p>A segment named <code>media</code>, with no range: the whole file.</p></div>
         </div>
       </div>
       <div class="entry">
@@ -1672,8 +1770,23 @@ data.</em></li>
           <li><b>mut timeline</b><span>Array[Timeline]</span> <em>The segments' times and lengths, when they are not all the same.</em></li>
         </ul>
         <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Template::count(self : Template, seconds : Double) -&gt; Int32</code>
+          <div class="doc"><p>How many segments this template addresses, when the presentation lasts <code>seconds</code>.</p>
+<p>A template with one duration repeats it until the presentation ends; a template with a timeline answers with the entries it lists.</p></div>
+        </div>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Template::initialization_url(self : Template, representation_id? : StringView, bandwidth? : Int32) -&gt; String</code>
+          <div class="doc"><p>The URL of the initialisation section this template names.</p></div>
+        </div>
+        <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Template::new() -&gt; Template</code>
           <div class="doc"><p>A template with nothing set.</p></div>
+        </div>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> Template::segment_url(self : Template, number? : Int64, representation_id? : StringView, time? : Int64, bandwidth? : Int32) -&gt; String</code>
+          <div class="doc"><p>The URL a segment of this template is fetched from.</p>
+<p>A template is a name with the numbers filled in: <code>$RepresentationID$</code> for which rendition, <code>$Number$</code> for which segment, <code>$Time$</code> for a segment addressed by the time it starts, and <code>$Bandwidth$</code> for what it costs. A number may carry a width, <code>$Number%05d$</code>, which is how a list of segments stays in order when it is listed.</p>
+<p>An identifier this release does not know is written back as it was written, so a caller comparing names can see that the template asked for something else rather than fetching the wrong one.</p></div>
         </div>
       </div>
       <div class="entry">

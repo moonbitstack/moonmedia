@@ -34,12 +34,24 @@ pub(all) struct AdaptationSet {
   mut audio_sampling_rate : Int32?
   mut base_url : String?
   mut template : Template?
+  mut segment_list : SegmentList?
+  mut segment_base : SegmentBase?
   mut representations : Array[Representation]
 }
 pub fn AdaptationSet::equal(Self, Self) -> Bool
 pub fn AdaptationSet::new(content_type? : String, mime_type? : String, lang? : String) -> Self
 pub fn AdaptationSet::not_equal(Self, Self) -> Bool
 pub fn AdaptationSet::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Initialization {
+  mut source_url : String?
+  mut range : Range?
+}
+pub fn Initialization::equal(Self, Self) -> Bool
+pub fn Initialization::new(source_url? : String) -> Self
+pub fn Initialization::not_equal(Self, Self) -> Bool
+pub fn Initialization::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) enum Kind {
@@ -81,12 +93,27 @@ pub(all) struct Period {
   mut duration : Double?
   mut base_url : String?
   mut template : Template?
+  mut segment_list : SegmentList?
+  mut segment_base : SegmentBase?
   mut adaptations : Array[AdaptationSet]
 }
 pub fn Period::equal(Self, Self) -> Bool
 pub fn Period::new(id? : String, start? : Double) -> Self
 pub fn Period::not_equal(Self, Self) -> Bool
 pub fn Period::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct Range {
+  mut start : Int64
+  mut end : Int64?
+}
+pub fn Range::equal(Self, Self) -> Bool
+pub fn Range::length(Self) -> Int64?
+pub fn Range::new(Int64, end? : Int64) -> Self
+pub fn Range::not_equal(Self, Self) -> Bool
+pub fn Range::of(StringView) -> Self?
+pub fn Range::text(Self) -> String
+pub fn Range::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Representation {
@@ -100,11 +127,52 @@ pub(all) struct Representation {
   mut audio_sampling_rate : Int32?
   mut base_url : String?
   mut template : Template?
+  mut segment_list : SegmentList?
+  mut segment_base : SegmentBase?
 }
 pub fn Representation::equal(Self, Self) -> Bool
 pub fn Representation::new(String, bandwidth? : Int32) -> Self
 pub fn Representation::not_equal(Self, Self) -> Bool
 pub fn Representation::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SegmentBase {
+  mut timescale : Int64?
+  mut presentation_time_offset : Int64?
+  mut index_range : Range?
+  mut index_range_exact : Bool?
+  mut initialization : Initialization?
+}
+pub fn SegmentBase::equal(Self, Self) -> Bool
+pub fn SegmentBase::new() -> Self
+pub fn SegmentBase::not_equal(Self, Self) -> Bool
+pub fn SegmentBase::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SegmentList {
+  mut timescale : Int64?
+  mut duration : Int64?
+  mut start_number : Int64?
+  mut presentation_time_offset : Int64?
+  mut initialization : Initialization?
+  mut urls : Array[SegmentUrl]
+}
+pub fn SegmentList::equal(Self, Self) -> Bool
+pub fn SegmentList::length(Self) -> Int32
+pub fn SegmentList::new() -> Self
+pub fn SegmentList::not_equal(Self, Self) -> Bool
+pub fn SegmentList::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct SegmentUrl {
+  mut media : String?
+  mut media_range : Range?
+  mut index_range : Range?
+}
+pub fn SegmentUrl::equal(Self, Self) -> Bool
+pub fn SegmentUrl::new(media? : String) -> Self
+pub fn SegmentUrl::not_equal(Self, Self) -> Bool
+pub fn SegmentUrl::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Template {
@@ -116,9 +184,12 @@ pub(all) struct Template {
   mut media : String?
   mut timeline : Array[Timeline]
 }
+pub fn Template::count(Self, Double) -> Int32
 pub fn Template::equal(Self, Self) -> Bool
+pub fn Template::initialization_url(Self, representation_id? : StringView, bandwidth? : Int32) -> String
 pub fn Template::new() -> Self
 pub fn Template::not_equal(Self, Self) -> Bool
+pub fn Template::segment_url(Self, number? : Int64, representation_id? : StringView, time? : Int64, bandwidth? : Int32) -> String
 pub fn Template::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)

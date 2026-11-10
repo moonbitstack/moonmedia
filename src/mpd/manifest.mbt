@@ -131,6 +131,8 @@ pub(all) struct Representation {
   mut audio_sampling_rate : Int32?
   mut base_url : String?
   mut template : Template?
+  mut segment_list : SegmentList?
+  mut segment_base : SegmentBase?
 }
 
 ///|
@@ -153,6 +155,8 @@ pub fn Representation::new(id : String, bandwidth? : Int32) -> Representation {
     audio_sampling_rate: None,
     base_url: None,
     template: None,
+    segment_list: None,
+    segment_base: None,
   }
 }
 
@@ -174,6 +178,8 @@ pub(all) struct AdaptationSet {
   mut audio_sampling_rate : Int32?
   mut base_url : String?
   mut template : Template?
+  mut segment_list : SegmentList?
+  mut segment_base : SegmentBase?
   mut representations : Array[Representation]
 }
 
@@ -204,6 +210,8 @@ pub fn AdaptationSet::new(
     audio_sampling_rate: None,
     base_url: None,
     template: None,
+    segment_list: None,
+    segment_base: None,
     representations: [],
   }
 }
@@ -218,6 +226,8 @@ pub(all) struct Period {
   mut duration : Double?
   mut base_url : String?
   mut template : Template?
+  mut segment_list : SegmentList?
+  mut segment_base : SegmentBase?
   mut adaptations : Array[AdaptationSet]
 }
 
@@ -236,6 +246,8 @@ pub fn Period::new(id? : String, start? : Double) -> Period {
     duration: None,
     base_url: None,
     template: None,
+    segment_list: None,
+    segment_base: None,
     adaptations: [],
   }
 }
@@ -353,6 +365,8 @@ fn read_period(element : Element) -> Period raise MpdError {
   period.duration = seconds(element, "duration")
   period.base_url = text_of_child(element, "BaseURL")
   period.template = read_template(element)
+  period.segment_list = read_segment_list(element)
+  period.segment_base = read_segment_base(element, "SegmentBase")
   for adaptation in element.children_of("AdaptationSet") {
     period.adaptations.push(read_adaptation(adaptation))
   }
@@ -378,10 +392,32 @@ fn read_adaptation(element : Element) -> AdaptationSet raise MpdError {
   set.audio_sampling_rate = integer(element, "audioSamplingRate")
   set.base_url = text_of_child(element, "BaseURL")
   set.template = read_template(element)
+  set.segment_list = read_segment_list(element)
+  set.segment_base = read_segment_base(element, "SegmentBase")
+  set.content_type = content_type(element, set.content_type)
   for representation in element.children_of("Representation") {
     set.representations.push(read_representation(representation))
   }
   set
+}
+
+///|
+/// The content type of a set, which a packager may write as a component of the
+/// set instead of an attribute: the first component that names one speaks for
+/// the set.
+fn content_type(element : Element, written : String?) -> String? {
+  match written {
+    Some(value) => Some(value)
+    None => {
+      for component in element.children_of("ContentComponent") {
+        match optional(component, "contentType") {
+          Some(value) => return Some(value)
+          None => ()
+        }
+      }
+      None
+    }
+  }
 }
 
 ///|
@@ -396,6 +432,8 @@ fn read_representation(element : Element) -> Representation raise MpdError {
   representation.audio_sampling_rate = integer(element, "audioSamplingRate")
   representation.base_url = text_of_child(element, "BaseURL")
   representation.template = read_template(element)
+  representation.segment_list = read_segment_list(element)
+  representation.segment_base = read_segment_base(element, "SegmentBase")
   representation
 }
 
@@ -575,6 +613,14 @@ fn Period::encode(self : Period) -> Element {
     Some(value) => out.children.push(text_element("BaseURL", value))
     None => ()
   }
+  match self.segment_base {
+    Some(value) => out.children.push(segment_base_element(value))
+    None => ()
+  }
+  match self.segment_list {
+    Some(value) => out.children.push(segment_list_element(value))
+    None => ()
+  }
   match self.template {
     Some(value) => out.children.push(template_element(value))
     None => ()
@@ -625,6 +671,14 @@ fn AdaptationSet::encode(self : AdaptationSet) -> Element {
     Some(value) => out.children.push(text_element("BaseURL", value))
     None => ()
   }
+  match self.segment_base {
+    Some(value) => out.children.push(segment_base_element(value))
+    None => ()
+  }
+  match self.segment_list {
+    Some(value) => out.children.push(segment_list_element(value))
+    None => ()
+  }
   match self.template {
     Some(value) => out.children.push(template_element(value))
     None => ()
@@ -659,6 +713,14 @@ fn Representation::encode(self : Representation) -> Element {
   )
   match self.base_url {
     Some(value) => out.children.push(text_element("BaseURL", value))
+    None => ()
+  }
+  match self.segment_base {
+    Some(value) => out.children.push(segment_base_element(value))
+    None => ()
+  }
+  match self.segment_list {
+    Some(value) => out.children.push(segment_list_element(value))
     None => ()
   }
   match self.template {

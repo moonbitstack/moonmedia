@@ -42,6 +42,7 @@ pub extend Fragment with @moonbitlang/core/debug.Debug::{to_repr}
 /// fragment boundary is a run of whole boxes.
 pub fn Mp4::fragments(self : Mp4) -> Array[Fragment] raise Mp4Error {
   let out : Array[Fragment] = []
+  let defaults = self.sample_defaults()
   // Offsets are not carried by the tree, so they are recovered by walking the
   // top-level boxes in file order. A fragment runs to the next `moof`, which
   // means it takes the media data box after it: a fragment cut anywhere else
@@ -68,11 +69,66 @@ pub fn Mp4::fragments(self : Mp4) -> Array[Fragment] raise Mp4Error {
     }
     let runs : Array[Run] = []
     for traf in box.children_of("traf") {
-      runs.push(traf_runs(traf, start, end))
+      runs.push(traf_runs(traf, start, end, defaults))
     }
     out.push({ sequence, start, end, runs, })
   }
   out
+}
+
+///|
+/// What a track says about its samples when a fragment leaves it out: the
+/// `trex` defaults, which every segment of a packaged stream relies on.
+priv struct SampleDefaults {
+  duration : Int64
+  size : Int32
+  flags : Int32
+}
+
+///|
+/// The `trex` defaults of every track, in track order.
+fn Mp4::sample_defaults(
+  self : Mp4,
+) -> Array[(Int32, SampleDefaults)] raise Mp4Error {
+  let out : Array[(Int32, SampleDefaults)] = []
+  let moov = match self.movie() {
+    Some(moov) => moov
+    None => return out
+  }
+  let mvex = match moov.child("mvex") {
+    Some(mvex) => mvex
+    None => return out
+  }
+  for trex in mvex.children_of("trex") {
+    let raw = trex.raw()[:]
+    // A track extends box has nothing variable in it: four bytes of version and
+    // flags, then the five fields a fragment may inherit.
+    out.push(
+      (
+        read_u32(raw, 4),
+        {
+          duration: read_u32(raw, 12).to_int64(),
+          size: read_u32(raw, 16),
+          flags: read_u32(raw, 20),
+        },
+      ),
+    )
+  }
+  out
+}
+
+///|
+/// The defaults a fragment of `track_id` inherits.
+fn defaults_for(
+  defaults : Array[(Int32, SampleDefaults)],
+  track_id : Int32,
+) -> SampleDefaults {
+  for pair in defaults {
+    if pair.0 == track_id {
+      return pair.1
+    }
+  }
+  { duration: 0L, size: 0, flags: 0, }
 }
 
 ///|
@@ -119,6 +175,7 @@ fn traf_runs(
   traf : Box,
   moof_start : Int32,
   fragment_end : Int32,
+  defaults : Array[(Int32, SampleDefaults)],
 ) -> Run raise Mp4Error {
   let tfhd = match traf.child("tfhd") {
     Some(box) => box.raw()[:]
@@ -126,6 +183,9 @@ fn traf_runs(
   }
   let flags = read_u24(tfhd, 1)
   let track_id = read_u32(tfhd, 4)
+  // A fragment that names no default takes the track's: a segment written by a
+  // packager leaves the durations in `trex` and says nothing per sample.
+  let inherited = defaults_for(defaults, track_id)
   let mut cursor = 8
   let base_data_offset = if (flags & 0x000001) != 0 {
     let value = read_u64(tfhd, cursor)
@@ -142,21 +202,21 @@ fn traf_runs(
     cursor = cursor + 4
     Some(value)
   } else {
-    None
+    Some(inherited.duration)
   }
   let default_size = if (flags & 0x000010) != 0 {
     let value = read_u32(tfhd, cursor)
     cursor = cursor + 4
     Some(value)
   } else {
-    None
+    Some(inherited.size)
   }
   let default_flags = if (flags & 0x000020) != 0 {
     let value = read_u32(tfhd, cursor)
     cursor = cursor + 4
     Some(value)
   } else {
-    None
+    Some(inherited.flags)
   }
   // Without an explicit base, sample data sits in the movie fragment that
   // describes it; the older rule points at the start of the file instead.

@@ -301,8 +301,10 @@ fn strip_sample_table(trak : Box) -> Box {
     } else if box.is_type("tkhd") {
       boxes.push(with_duration(box, 0L))
     } else if box.is_type("edts") {
-      // An edit list would place the samples of a file that is no longer
-      // there, so it is dropped.
+      // An edit list stays: it says where in the media the presentation
+      // starts, and the fragments still carry that media. Dropped, a codec's
+      // priming samples would play as if they were the start of the sound.
+      boxes.push(box)
     } else {
       boxes.push(box)
     }

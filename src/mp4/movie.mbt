@@ -207,6 +207,14 @@ pub(all) struct Track {
   height : Int32
   sample_rate : Int32
   channels : Int32
+  /// The media time at which presentation starts, from the track's edit list.
+  ///
+  /// A codec that primes its decoder keeps the priming samples in the file and
+  /// asks the player to start the presentation later; that is an edit list, and
+  /// a track without one starts where its media starts. Subtract it from a
+  /// sample's decode time to get the time the sample is played at relative to
+  /// the start of the presentation.
+  edit_time : Int64
   samples : Array[Sample]
 }
 
@@ -391,8 +399,41 @@ fn track_header(trak : Box, mvhd : MovieHeader) -> Track raise Mp4Error {
     },
     sample_rate,
     channels,
+    edit_time: edit_time(trak),
     samples: [],
   }
+}
+
+///|
+/// Where the presentation starts in the media timeline, from `edts/elst`.
+///
+/// The first edit that plays media says which media time is presented first;
+/// an empty edit before it is a delay, and a reader that added it to the offset
+/// would shift a stream whose first edit is one.
+fn edit_time(trak : Box) -> Int64 raise Mp4Error {
+  let elst = match trak.child("edts") {
+    Some(edts) => edts
+    None => return 0L
+  }
+  let raw = match elst.child("elst") {
+    Some(box) => box.raw()[:]
+    None => return 0L
+  }
+  let wide = read_u8(raw, 0) == 1
+  let count = read_u32(raw, 4)
+  let mut at = 8
+  for i = 0; i < count; i = i + 1 {
+    let (media_time, step) = if wide {
+      (read_u64(raw, at + 8), 20)
+    } else {
+      (read_u32(raw, at + 4).to_int64(), 12)
+    }
+    if media_time >= 0L {
+      return media_time
+    }
+    at = at + step
+  }
+  0L
 }
 
 ///|

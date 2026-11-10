@@ -802,6 +802,11 @@
           <li><b>height</b><span>Int32</span></li>
           <li><b>sample_rate</b><span>Int32</span></li>
           <li><b>channels</b><span>Int32</span></li>
+          <li><b>edit_time</b><span>Int64</span> <em>The media time at which presentation starts, from the track's edit list. A codec that primes its decoder keeps the priming samples in the file and
+asks the player to start the presentation later; that is an edit list, and
+a track without one starts where its media starts. Subtract it from a
+sample's decode time to get the time the sample is played at relative to
+the start of the presentation.</em></li>
           <li><b>samples</b><span>Array[Sample]</span></li>
         </ul>
       </div>

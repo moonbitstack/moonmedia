@@ -208,6 +208,7 @@ pub(all) struct Track {
   height : Int32
   sample_rate : Int32
   channels : Int32
+  edit_time : Int64
   samples : Array[Sample]
 }
 pub fn Track::equal(Self, Self) -> Bool

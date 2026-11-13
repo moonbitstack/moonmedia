@@ -67,7 +67,7 @@
           <a href="#mp4" title="ISO base media">mp4<span>55</span></a>
           <a href="#ts" title="MPEG-TS">ts<span>57</span></a>
           <a href="#rtmp" title="RTMP">rtmp<span>59</span></a>
-          <a href="#mpd" title="DASH">mpd<span>39</span></a>
+          <a href="#mpd" title="DASH">mpd<span>41</span></a>
           <a href="#moonmedia" title="Packager">moonmedia<span>13</span></a>
       </nav>
     </aside>
@@ -1559,11 +1559,27 @@ data.</em></li>
           <li><b>mut template</b><span>Template?</span></li>
           <li><b>mut segment_list</b><span>SegmentList?</span></li>
           <li><b>mut segment_base</b><span>SegmentBase?</span></li>
+          <li><b>mut protection</b><span>Array[ContentProtection]</span></li>
           <li><b>mut representations</b><span>Array[Representation]</span></li>
         </ul>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> AdaptationSet::new(content_type? : String, mime_type? : String, lang? : String) -&gt; AdaptationSet</code>
           <div class="doc"><p>A set carrying <code>content_type</code>, <code>mime_type</code> and a language.</p></div>
+        </div>
+      </div>
+      <div class="entry">
+        <span class="kind">struct</span>
+        <code class="sig"><span class="kw">pub(all) struct</span> ContentProtection</code>
+        <div class="doc"><p>One <code>ContentProtection</code> entry: the scheme that names a key system, the value that scheme gives the rendition, and the protection header the key system is handed.</p>
+<p>A manifest does not encrypt anything itself; it says which key system opens a rendition and gives that system the box it needs. The box travels base64 in the manifest and is kept here as the bytes it decodes to, so a caller hands it on without decoding anything a second time.</p></div>
+        <ul class="fields">
+          <li><b>mut scheme_id_uri</b><span>String</span> <em>The scheme that names what protects the rendition, often a UUID.</em></li>
+          <li><b>mut value</b><span>String?</span> <em>The value the scheme gives this entry, when it gives one.</em></li>
+          <li><b>mut pssh</b><span>Bytes?</span> <em>The <code>pssh</code> box, decoded.</em></li>
+        </ul>
+        <div class="entry method">
+          <code class="sig"><span class="kw">pub fn</span> ContentProtection::new(scheme_id_uri : String, value? : String, pssh? : Bytes) -&gt; ContentProtection</code>
+          <div class="doc"><p>An entry for <code>scheme_id_uri</code>, optionally carrying a value and a header.</p></div>
         </div>
       </div>
       <div class="entry">
@@ -1652,6 +1668,7 @@ data.</em></li>
           <li><b>mut template</b><span>Template?</span></li>
           <li><b>mut segment_list</b><span>SegmentList?</span></li>
           <li><b>mut segment_base</b><span>SegmentBase?</span></li>
+          <li><b>mut protection</b><span>Array[ContentProtection]</span></li>
           <li><b>mut adaptations</b><span>Array[AdaptationSet]</span></li>
         </ul>
         <div class="entry method">
@@ -1702,6 +1719,7 @@ data.</em></li>
           <li><b>mut template</b><span>Template?</span></li>
           <li><b>mut segment_list</b><span>SegmentList?</span></li>
           <li><b>mut segment_base</b><span>SegmentBase?</span></li>
+          <li><b>mut protection</b><span>Array[ContentProtection]</span></li>
         </ul>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Representation::new(id : String, bandwidth? : Int32) -&gt; Representation</code>

@@ -133,6 +133,7 @@ pub(all) struct Representation {
   mut template : Template?
   mut segment_list : SegmentList?
   mut segment_base : SegmentBase?
+  mut protection : Array[ContentProtection]
 }
 
 ///|
@@ -157,6 +158,7 @@ pub fn Representation::new(id : String, bandwidth? : Int32) -> Representation {
     template: None,
     segment_list: None,
     segment_base: None,
+    protection: [],
   }
 }
 
@@ -180,6 +182,7 @@ pub(all) struct AdaptationSet {
   mut template : Template?
   mut segment_list : SegmentList?
   mut segment_base : SegmentBase?
+  mut protection : Array[ContentProtection]
   mut representations : Array[Representation]
 }
 
@@ -212,6 +215,7 @@ pub fn AdaptationSet::new(
     template: None,
     segment_list: None,
     segment_base: None,
+    protection: [],
     representations: [],
   }
 }
@@ -228,6 +232,7 @@ pub(all) struct Period {
   mut template : Template?
   mut segment_list : SegmentList?
   mut segment_base : SegmentBase?
+  mut protection : Array[ContentProtection]
   mut adaptations : Array[AdaptationSet]
 }
 
@@ -248,6 +253,7 @@ pub fn Period::new(id? : String, start? : Double) -> Period {
     template: None,
     segment_list: None,
     segment_base: None,
+    protection: [],
     adaptations: [],
   }
 }
@@ -364,6 +370,7 @@ fn read_period(element : Element) -> Period raise MpdError {
   period.start = seconds(element, "start")
   period.duration = seconds(element, "duration")
   period.base_url = text_of_child(element, "BaseURL")
+  period.protection = read_protection(element)
   period.template = read_template(element)
   period.segment_list = read_segment_list(element)
   period.segment_base = read_segment_base(element, "SegmentBase")
@@ -391,6 +398,7 @@ fn read_adaptation(element : Element) -> AdaptationSet raise MpdError {
   set.frame_rate = rate(element, "frameRate")
   set.audio_sampling_rate = integer(element, "audioSamplingRate")
   set.base_url = text_of_child(element, "BaseURL")
+  set.protection = read_protection(element)
   set.template = read_template(element)
   set.segment_list = read_segment_list(element)
   set.segment_base = read_segment_base(element, "SegmentBase")
@@ -431,6 +439,7 @@ fn read_representation(element : Element) -> Representation raise MpdError {
   representation.frame_rate = rate(element, "frameRate")
   representation.audio_sampling_rate = integer(element, "audioSamplingRate")
   representation.base_url = text_of_child(element, "BaseURL")
+  representation.protection = read_protection(element)
   representation.template = read_template(element)
   representation.segment_list = read_segment_list(element)
   representation.segment_base = read_segment_base(element, "SegmentBase")
@@ -609,6 +618,9 @@ fn Period::encode(self : Period) -> Element {
     Some(value) => out.attributes.push(("duration", format_duration(value)))
     None => ()
   }
+  for protection in self.protection {
+    out.children.push(content_protection_element(protection))
+  }
   match self.base_url {
     Some(value) => out.children.push(text_element("BaseURL", value))
     None => ()
@@ -667,6 +679,9 @@ fn AdaptationSet::encode(self : AdaptationSet) -> Element {
     "audioSamplingRate",
     self.audio_sampling_rate.map(fn(value) { value.to_string() }),
   )
+  for protection in self.protection {
+    out.children.push(content_protection_element(protection))
+  }
   match self.base_url {
     Some(value) => out.children.push(text_element("BaseURL", value))
     None => ()
@@ -711,6 +726,9 @@ fn Representation::encode(self : Representation) -> Element {
     "audioSamplingRate",
     self.audio_sampling_rate.map(fn(value) { value.to_string() }),
   )
+  for protection in self.protection {
+    out.children.push(content_protection_element(protection))
+  }
   match self.base_url {
     Some(value) => out.children.push(text_element("BaseURL", value))
     None => ()

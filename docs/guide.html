@@ -404,6 +404,36 @@ segments in one second: 2
 index 1409-1476, 68 bytes
 init 0-1380
 a list of 1 segment, 13916 bytes</div>
+<p>Protected content is signalled in the manifest, not in the media: an entry
+names the key system and carries the header that system is handed, base64 in
+the document. The header arrives decoded, and leaves the model encoded, so a
+manifest that is read and written again still says which key opens it.</p><div class="code"><span class="label">moonbit</span><pre>test {
+  let manifest = @mpd.Manifest::new(kind=@mpd.Kind::Static)
+  manifest.duration = Some(8.0)
+  let period = @mpd.Period::new(id="1")
+  let video = @mpd.AdaptationSet::new(content_type="video")
+  video.protection.push(@mpd.ContentProtection::new(
+    "urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+    pssh=b"psshpayload",
+  ))
+  period.adaptations.push(video)
+  manifest.periods.push(period)
+  let xml = manifest.encode()
+  println(xml)
+  let header = @mpd.Manifest::parse(xml)
+    .periods[0].adaptations[0].protection[0].pssh.unwrap()
+  println("header: " + header.length().to_string() + " bytes")
+}</pre></div><div class="out">&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;MPD xmlns="urn:mpeg:dash:schema:mpd:2011" type="static" profiles="urn:mpeg:dash:profile:isoff-on-demand:2011" minBufferTime="PT2S" mediaPresentationDuration="PT8S"&gt;
+  &lt;Period id="1"&gt;
+    &lt;AdaptationSet contentType="video"&gt;
+      &lt;ContentProtection schemeIdUri="urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed" xmlns:cenc="urn:mpeg:cenc:2013"&gt;
+        &lt;cenc:pssh&gt;cHNzaHBheWxvYWQ=&lt;/cenc:pssh&gt;
+      &lt;/ContentProtection&gt;
+    &lt;/AdaptationSet&gt;
+  &lt;/Period&gt;
+&lt;/MPD&gt;
+header: 11 bytes</div>
     </section>
     <section id="checked">
       <h2>Checked against other implementations</h2>

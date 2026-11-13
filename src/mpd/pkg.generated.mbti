@@ -36,12 +36,24 @@ pub(all) struct AdaptationSet {
   mut template : Template?
   mut segment_list : SegmentList?
   mut segment_base : SegmentBase?
+  mut protection : Array[ContentProtection]
   mut representations : Array[Representation]
 }
 pub fn AdaptationSet::equal(Self, Self) -> Bool
 pub fn AdaptationSet::new(content_type? : String, mime_type? : String, lang? : String) -> Self
 pub fn AdaptationSet::not_equal(Self, Self) -> Bool
 pub fn AdaptationSet::to_repr(Self) -> @debug.Repr
+
+#derive(Eq, @debug.Debug)
+pub(all) struct ContentProtection {
+  mut scheme_id_uri : String
+  mut value : String?
+  mut pssh : Bytes?
+}
+pub fn ContentProtection::equal(Self, Self) -> Bool
+pub fn ContentProtection::new(String, value? : String, pssh? : Bytes) -> Self
+pub fn ContentProtection::not_equal(Self, Self) -> Bool
+pub fn ContentProtection::to_repr(Self) -> @debug.Repr
 
 #derive(Eq, @debug.Debug)
 pub(all) struct Initialization {
@@ -95,6 +107,7 @@ pub(all) struct Period {
   mut template : Template?
   mut segment_list : SegmentList?
   mut segment_base : SegmentBase?
+  mut protection : Array[ContentProtection]
   mut adaptations : Array[AdaptationSet]
 }
 pub fn Period::equal(Self, Self) -> Bool
@@ -129,6 +142,7 @@ pub(all) struct Representation {
   mut template : Template?
   mut segment_list : SegmentList?
   mut segment_base : SegmentBase?
+  mut protection : Array[ContentProtection]
 }
 pub fn Representation::equal(Self, Self) -> Bool
 pub fn Representation::new(String, bandwidth? : Int32) -> Self

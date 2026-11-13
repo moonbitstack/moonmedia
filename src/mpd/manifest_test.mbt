@@ -187,3 +187,80 @@ test "panic: an unclosed element is refused" {
 test "panic: a duration that is not one is refused" {
   @mpd.Manifest::parse("<MPD minBufferTime=\"soon\"/>") |> ignore
 }
+
+///|
+/// An encrypted manifest: one entry names the key system and carries its header,
+/// another names the encryption scheme the header applies to, and a rendition
+/// repeats the entry for the one track that needs it.
+let encrypted : String =
+  #|<?xml version="1.0" encoding="UTF-8"?>
+  #|<MPD xmlns="urn:mpeg:dash:schema:mpd:2011" xmlns:cenc="urn:mpeg:cenc:2013" type="static" minBufferTime="PT2S" mediaPresentationDuration="PT10S">
+  #|  <Period id="1">
+  #|    <AdaptationSet id="1" contentType="video" mimeType="video/mp4">
+  #|      <ContentProtection schemeIdUri="urn:mpeg:dash:mp4protection:2011" value="cenc"/>
+  #|      <ContentProtection schemeIdUri="urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed">
+  #|        <cenc:pssh>cHNzaHBheWxvYWQ=</cenc:pssh>
+  #|      </ContentProtection>
+  #|      <SegmentTemplate timescale="1000" duration="4000" media="seg-$Number$.m4s"/>
+  #|      <Representation id="v0" bandwidth="1200000">
+  #|        <ContentProtection schemeIdUri="urn:uuid:9a04f079-9840-4286-ab92-e65be0885f95" value="MSPR 2.0"/>
+  #|      </Representation>
+  #|    </AdaptationSet>
+  #|  </Period>
+  #|</MPD>
+  #|
+
+///|
+test "content protection is read as the key system and the header it carries" {
+  let manifest = @mpd.Manifest::parse(encrypted)
+  let set = manifest.periods[0].adaptations[0]
+  assert_eq(set.protection.length(), 2)
+  // The scheme that says what is encrypted, with the value it gives.
+  assert_eq(set.protection[0].value, Some("cenc"))
+  assert_eq(set.protection[0].pssh, None)
+  // The scheme that names a key system, with its header decoded rather than
+  // left as the text the document carried.
+  let widevine = set.protection[1]
+  assert_eq(
+    widevine.scheme_id_uri,
+    "urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+  )
+  assert_eq(widevine.pssh, Some(b"psshpayload"))
+  // A rendition carries its own entry.
+  let rendition = set.representations[0]
+  assert_eq(rendition.protection.length(), 1)
+  assert_eq(rendition.protection[0].value, Some("MSPR 2.0"))
+  assert_eq(rendition.protection[0].pssh, None)
+}
+
+///|
+test "content protection is written back where the schema puts it" {
+  let manifest = @mpd.Manifest::parse(encrypted)
+  let xml = manifest.encode()
+  // The header is written as the base64 the document carried, under an element
+  // that declares the prefix: a rewritten manifest has no prolog to inherit one
+  // from, and a `cenc:` name without it is not a document.
+  assert_eq(
+    xml.contains(
+      "<ContentProtection schemeIdUri=\"urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed\" xmlns:cenc=\"urn:mpeg:cenc:2013\">",
+    ),
+    true,
+  )
+  assert_eq(xml.contains("<cenc:pssh>cHNzaHBheWxvYWQ=</cenc:pssh>"), true)
+  // Before the addressing, which is where the schema puts it.
+  let entry = xml.find("<ContentProtection").unwrap()
+  let addressing = xml.find("<SegmentTemplate").unwrap()
+  assert_true(entry < addressing)
+  // And what is written reads back as what was read.
+  let again = @mpd.Manifest::parse(xml)
+  assert_eq(
+    again.periods[0].adaptations[0].protection,
+    manifest.periods[0].adaptations[0].protection,
+  )
+}
+
+///|
+test "panic: a protection header that is not base64 is refused" {
+  let text = "<MPD xmlns=\"urn:mpeg:dash:schema:mpd:2011\" type=\"static\"><Period><AdaptationSet contentType=\"video\"><ContentProtection schemeIdUri=\"urn:uuid:x\"><cenc:pssh>not base64!</cenc:pssh></ContentProtection></AdaptationSet></Period></MPD>"
+  @mpd.Manifest::parse(text) |> ignore
+}

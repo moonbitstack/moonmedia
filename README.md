@@ -382,6 +382,25 @@ base.initialization.unwrap().range = @mpd.Range::of("0-1380")
 assert_eq(base.index_range.unwrap().start, 1409L)
 ```
 
+A protected rendition says so in the same manifest: an entry names the key
+system, and the header that system needs travels base64. The entry is read into
+the model with the header already decoded, and written back encoded, so a
+manifest can be rewritten without losing what it said about protection.
+
+```moonbit
+let protection = @mpd.ContentProtection::new(
+  "urn:uuid:edef8ba9-79d6-4ace-a3c8-27dcd51d21ed",
+  pssh=b"psshpayload",
+)
+manifest.periods[0].adaptations[0].protection.push(protection)
+let protected = manifest.encode()
+assert_eq(protected.contains("<cenc:pssh>cHNzaHBheWxvYWQ=</cenc:pssh>"), true)
+assert_eq(
+  @mpd.Manifest::parse(protected).periods[0].adaptations[0].protection[0].pssh,
+  Some(b"psshpayload"),
+)
+```
+
 ## How the packages behave
 
 **Bytes in, bytes out.** Nothing here opens a socket, reads a file or keeps
@@ -478,6 +497,7 @@ when the track has no edit list.
 | `Template::segment_url(...)`, `Template::initialization_url(...)` | a name with the numbers filled in |
 | `Template::count(seconds)` | how many segments a template addresses |
 | `SegmentList`, `SegmentUrl`, `SegmentBase`, `Initialization`, `Range` | the other two ways to address a segment |
+| `ContentProtection` | a key system, its value and the header it is handed |
 | `parse_duration(text)`, `format_duration(seconds)` | ISO 8601 durations |
 | `Kind` | static or dynamic |
 

@@ -63,12 +63,12 @@
     <aside class="api-side">
       <input class="filter" id="filter" type="search" placeholder="Filter names" aria-label="Filter names">
       <nav aria-label="Packages">
-          <a href="#m3u8" title="HLS playlists">m3u8<span>54</span></a>
-          <a href="#mp4" title="ISO base media">mp4<span>55</span></a>
-          <a href="#ts" title="MPEG-TS">ts<span>57</span></a>
-          <a href="#rtmp" title="RTMP">rtmp<span>59</span></a>
-          <a href="#mpd" title="DASH">mpd<span>41</span></a>
-          <a href="#moonmedia" title="Packager">moonmedia<span>13</span></a>
+          <a href="#m3u8" title="HLS playlists">m3u8<span>121</span></a>
+          <a href="#mp4" title="ISO base media">mp4<span>98</span></a>
+          <a href="#ts" title="MPEG-TS">ts<span>82</span></a>
+          <a href="#rtmp" title="RTMP">rtmp<span>69</span></a>
+          <a href="#mpd" title="DASH">mpd<span>81</span></a>
+          <a href="#moonmedia" title="Packager">moonmedia<span>22</span></a>
       </nav>
     </aside>
     <div class="api-body">
@@ -85,6 +85,10 @@
           <li><b>mut length</b><span>Int64</span></li>
           <li><b>mut offset</b><span>Int64?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> ByteRange::new(length : Int64, offset? : Int64) -&gt; ByteRange</code>
           <div class="doc"><p>One range, <code>length@offset</code>.</p></div>
@@ -101,6 +105,10 @@
           <li>SampleAes</li>
           <li>Other(String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Cipher::code(self : Cipher) -&gt; String</code>
           <div class="doc"><p>The method as it appears on the wire.</p></div>
@@ -127,6 +135,10 @@
           <li><b>mut end_on_next</b><span>Bool</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> DateRange::new(id : String, start_date? : String) -&gt; DateRange</code>
           <div class="doc"><p>The interval named <code>id</code>.</p></div>
@@ -142,6 +154,10 @@
           <li><b>mut import_</b><span>String?</span></li>
           <li><b>mut queryparam</b><span>String?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Define::new(name : String, value : String) -&gt; Define</code>
           <div class="doc"><p>A variable set to <code>value</code>.</p></div>
@@ -163,6 +179,10 @@
           <li><b>mut stable_variant_id</b><span>String?</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> IFrameStream::new(uri : String, bandwidth? : Int32) -&gt; IFrameStream</code>
           <div class="doc"><p>I-frame streams served from <code>uri</code>.</p></div>
@@ -176,6 +196,10 @@
           <li><b>mut uri</b><span>String</span></li>
           <li><b>mut byte_range</b><span>ByteRange?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> InitSection::new(uri : String, byte_range? : ByteRange) -&gt; InitSection</code>
           <div class="doc"><p>An initialisation section served from <code>uri</code>.</p></div>
@@ -194,6 +218,10 @@
           <li><b>mut key_format_versions</b><span>String?</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Key::is_plain(self : Key) -&gt; Bool</code>
           <div class="doc"><p>Whether the key leaves the stream in the clear.</p></div>
@@ -219,6 +247,10 @@
           <li><b>mut i_frame_streams</b><span>Array[IFrameStream]</span></li>
           <li><b>mut unknown</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Master::encode(self : Master) -&gt; String</code>
         </div>
@@ -238,6 +270,10 @@
           <li>ClosedCaptions</li>
           <li>Other(String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> MediaKind::code(self : MediaKind) -&gt; String</code>
           <div class="doc"><p>The kind as it appears on the wire.</p></div>
@@ -273,6 +309,10 @@
           <li><b>mut rendition_reports</b><span>Array[RenditionReport]</span></li>
           <li><b>mut unknown</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> MediaPlaylist::encode(self : MediaPlaylist) -&gt; String</code>
         </div>
@@ -292,6 +332,10 @@
           <li><b>mut byte_range</b><span>ByteRange?</span></li>
           <li><b>mut gap</b><span>Bool</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Part::new(uri : String, duration : Double, independent? : Bool, byte_range? : ByteRange, gap? : Bool) -&gt; Part</code>
           <div class="doc"><p>A part of the segment at <code>uri</code> lasting <code>duration</code> seconds.</p></div>
@@ -305,6 +349,10 @@
           <li>MasterPlaylist(Master)</li>
           <li>MediaPlaylist(MediaPlaylist)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Playlist::encode(self : Playlist) -&gt; String</code>
           <div class="doc"><p>Write a playlist back out.</p>
@@ -336,6 +384,10 @@
         <ul class="variants">
           <li>Malformed(at~ : Int32, want~ : String, got~ : String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">output</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> PlaylistError::to_string(Self) -&gt; String</code>
           <div class="doc"><p>The message, as the error prints it.</p></div>
@@ -350,6 +402,10 @@
           <li>Vod</li>
           <li>Other(String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -362,6 +418,10 @@
           <li><b>mut start</b><span>Int64?</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> PreloadHint::new(kind : String, uri : String, byte_range? : ByteRange, start? : Int64) -&gt; PreloadHint</code>
           <div class="doc"><p>A hint that <code>uri</code> will hold the next <code>kind</code> (<code>PART</code> or <code>MAP</code>).</p></div>
@@ -388,6 +448,10 @@
           <li><b>mut forced</b><span>Bool</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Rendition::new(kind : MediaKind, group_id : String, name : String, uri? : String) -&gt; Rendition</code>
           <div class="doc"><p>A rendition called <code>name</code> in the group <code>group_id</code>.</p></div>
@@ -403,6 +467,10 @@
           <li><b>mut last_part</b><span>Int32?</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> RenditionReport::new(uri : String, last_msn? : Int64, last_part? : Int32) -&gt; RenditionReport</code>
           <div class="doc"><p>A report on the rendition at <code>uri</code>.</p></div>
@@ -416,6 +484,10 @@
           <li><b>mut width</b><span>Int32</span></li>
           <li><b>mut height</b><span>Int32</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Resolution::new(width : Int32, height : Int32) -&gt; Resolution</code>
           <div class="doc"><p>A video size in pixels.</p></div>
@@ -437,6 +509,10 @@
           <li><b>mut map</b><span>InitSection?</span></li>
           <li><b>mut parts</b><span>Array[Part]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Segment::new(uri : String, duration : Double, title? : String) -&gt; Segment</code>
           <div class="doc"><p>A segment at <code>uri</code> lasting <code>duration</code> seconds.</p></div>
@@ -454,6 +530,10 @@
           <li><b>mut can_block_reload</b><span>Bool</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> ServerControl::new() -&gt; ServerControl</code>
           <div class="doc"><p>The reload advice with nothing set.</p></div>
@@ -470,6 +550,10 @@
           <li><b>mut language</b><span>String?</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> SessionData::new(data_id : String, value? : String, uri? : String, language? : String) -&gt; SessionData</code>
           <div class="doc"><p>The metadata named <code>data_id</code>, carried inline as <code>value</code> or by <code>uri</code>.</p></div>
@@ -483,6 +567,10 @@
           <li><b>mut time_offset</b><span>Double</span></li>
           <li><b>mut precise</b><span>Bool</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Start::new(time_offset : Double, precise? : Bool) -&gt; Start</code>
           <div class="doc"><p>Start <code>time_offset</code> seconds from the beginning.</p></div>
@@ -509,6 +597,10 @@
           <li><b>mut stable_variant_id</b><span>String?</span></li>
           <li><b>mut extra</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Variant::new(uri : String, bandwidth? : Int32, codecs? : String) -&gt; Variant</code>
           <div class="doc"><p>A variant streaming <code>uri</code>, using <code>bandwidth</code> bits per second.</p></div>
@@ -529,6 +621,10 @@
           <li><b>large</b><span>Bool</span></li>
           <li><b>content</b><span>Content</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Box::boxes(self : Box) -&gt; Array[Box]</code>
           <div class="doc"><p>The child boxes, or an empty array for a box that holds bytes.</p></div>
@@ -579,6 +675,10 @@
           <li>Children(prefix~ : Bytes, boxes~ : Array[Box])</li>
           <li>Bytes(raw~ : Bytes)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -589,6 +689,10 @@
           <li><b>minor</b><span>Int32</span></li>
           <li><b>compatible</b><span>Array[String]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> FileType::encode(self : FileType) -&gt; Bytes</code>
           <div class="doc"><p>Write a file type box.</p></div>
@@ -608,6 +712,10 @@
           <li><b>end</b><span>Int32</span> <em>Offset just past the fragment's last byte.</em></li>
           <li><b>runs</b><span>Array[Run]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -618,6 +726,10 @@
           <li><b>base_decode_time</b><span>Int64</span></li>
           <li><b>samples</b><span>Array[SampleData]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -631,6 +743,10 @@
           <li><b>sap_type</b><span>Int32</span></li>
           <li><b>sap_delta_time</b><span>Int64</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -640,6 +756,10 @@
           <li><b>sequence</b><span>Int32</span></li>
           <li><b>tracks</b><span>Array[FragmentTrack]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> MovieFragment::duration(self : MovieFragment, timescale : Int64) -&gt; Double</code>
           <div class="doc"><p>How long the fragment plays, in the timescale of its longest track.</p></div>
@@ -665,6 +785,10 @@
           <li><b>timescale</b><span>Int64</span></li>
           <li><b>duration</b><span>Int64</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -722,6 +846,10 @@
         <ul class="variants">
           <li>Malformed(at~ : Int32, want~ : String, got~ : String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">output</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Mp4Error::to_string(Self) -&gt; String</code>
           <div class="doc"><p>The message, as the error prints it.</p></div>
@@ -736,6 +864,10 @@
           <li><b>base_decode_time</b><span>Int64</span></li>
           <li><b>samples</b><span>Array[Sample]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -749,6 +881,10 @@
           <li><b>composition_offset</b><span>Int64</span> <em>How far presentation time runs ahead of decode time, for reordered video.</em></li>
           <li><b>sync</b><span>Bool</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Sample::pts(self : Sample) -&gt; Int64</code>
           <div class="doc"><p>When the sample is shown, in the track's timescale.</p></div>
@@ -768,6 +904,10 @@
           <li><b>composition_offset</b><span>Int64</span></li>
           <li><b>sync</b><span>Bool</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -781,6 +921,10 @@
           <li><b>first_offset</b><span>Int64</span></li>
           <li><b>references</b><span>Array[IndexReference]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> SegmentIndex::encode(self : SegmentIndex) -&gt; Bytes</code>
           <div class="doc"><p>Write a segment index back as a <code>sidx</code> box.</p>
@@ -809,6 +953,10 @@ sample's decode time to get the time the sample is played at relative to
 the start of the presentation.</em></li>
           <li><b>samples</b><span>Array[Sample]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">enum</span>
@@ -821,6 +969,10 @@ the start of the presentation.</em></li>
           <li>Hint</li>
           <li>Other(String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="group"><span class="kind">functions</span></div>
       <div class="entry">
@@ -886,6 +1038,10 @@ the start of the presentation.</em></li>
         <ul class="fields">
           <li><b>raw</b><span>Bytes</span> <em>The field after its length byte, stuffing included.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Adaptation::discontinuity(self : Adaptation) -&gt; Bool</code>
           <div class="doc"><p>Whether the stream is discontinuous at this packet.</p></div>
@@ -932,6 +1088,10 @@ the start of the presentation.</em></li>
           <li><b>payload</b><span>Bytes</span> <em>The payload as it sits in the packet, which for a partial packet is a
 piece of a unit and not the unit itself.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Packet::encode(self : Packet) -&gt; Bytes</code>
           <div class="doc"><p>Write the packet back as 188 bytes.</p></div>
@@ -966,6 +1126,10 @@ piece of a unit and not the unit itself.</em></li>
           <li><b>version</b><span>Int32</span></li>
           <li><b>programs</b><span>Array[Program]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Pat::encode(self : Pat) -&gt; Bytes</code>
           <div class="doc"><p>Write a programme association table.</p></div>
@@ -997,6 +1161,10 @@ next packet begins", which is what a video frame larger than a packet uses.</em>
           <li><b>header</b><span>Bytes</span> <em>The optional fields, verbatim: timestamps and the rarer flags.</em></li>
           <li><b>data</b><span>Bytes</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Pes::dts(self : Pes) -&gt; Int64?</code>
           <div class="doc"><p>The decode time of the packet, when it differs from the presentation time.</p></div>
@@ -1030,6 +1198,10 @@ next packet begins", which is what a video frame larger than a packet uses.</em>
           <li><b>descriptors</b><span>Bytes</span></li>
           <li><b>streams</b><span>Array[Stream]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Pmt::encode(self : Pmt) -&gt; Bytes</code>
           <div class="doc"><p>Write a programme map table.</p></div>
@@ -1056,6 +1228,10 @@ next packet begins", which is what a video frame larger than a packet uses.</em>
           <li><b>pid</b><span>Int32</span> <em>The identifier of the packet that carries this programme's map table, or
 the network information table when <code>number</code> is zero.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Program::new(number : Int32, pid : Int32) -&gt; Program</code>
           <div class="doc"><p>A programme of <code>number</code> whose map table is on <code>pid</code>.</p></div>
@@ -1075,6 +1251,10 @@ the network information table when <code>number</code> is zero.</em></li>
           <li><b>last_number</b><span>Int32</span></li>
           <li><b>body</b><span>Bytes</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Section::encode(self : Section) -&gt; Bytes</code>
           <div class="doc"><p>Write the section back, checksum included.</p></div>
@@ -1106,6 +1286,10 @@ the network information table when <code>number</code> is zero.</em></li>
           <li><b>pid</b><span>Int32</span></li>
           <li><b>descriptors</b><span>Bytes</span> <em>The descriptors as they came, tag, length and payload together.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Stream::new(stream_type : Int32, pid : Int32, descriptors? : Bytes) -&gt; Stream</code>
           <div class="doc"><p>A stream of <code>stream_type</code> on <code>pid</code>, with the descriptors that describe it.</p></div>
@@ -1119,6 +1303,10 @@ the network information table when <code>number</code> is zero.</em></li>
         <ul class="variants">
           <li>Malformed(at~ : Int32, want~ : String, got~ : String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">output</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> TsError::to_string(Self) -&gt; String</code>
           <div class="doc"><p>The message, as the error prints it.</p></div>
@@ -1220,6 +1408,10 @@ data.</em></li>
           <li>StrictArray(Array[Amf0])</li>
           <li>Date(Double, Int32)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Amf0::as_boolean(self : Amf0) -&gt; Bool?</code>
           <div class="doc"><p>The value as a boolean, when it is one.</p></div>
@@ -1336,6 +1528,10 @@ data.</em></li>
           <li><b>timestamp</b><span>Int32</span> <em>Milliseconds, and the same for every chunk of the message.</em></li>
           <li><b>payload</b><span>Bytes</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Message::new(type_ : Int32, stream_id : Int32, payload : Bytes, timestamp? : Int32) -&gt; Message</code>
           <div class="doc"><p>A message of <code>type_</code> on <code>stream_id</code>, carrying <code>payload</code>.</p></div>
@@ -1352,6 +1548,10 @@ data.</em></li>
           <li>Publishing <em>A stream is being pushed.</em></li>
           <li>Closed <em>The stream ended.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">error</span>
@@ -1360,6 +1560,10 @@ data.</em></li>
         <ul class="variants">
           <li>Malformed(at~ : Int32, want~ : String, got~ : String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">output</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> RtmpError::to_string(Self) -&gt; String</code>
           <div class="doc"><p>The message, as the error prints it.</p></div>
@@ -1562,6 +1766,10 @@ data.</em></li>
           <li><b>mut protection</b><span>Array[ContentProtection]</span></li>
           <li><b>mut representations</b><span>Array[Representation]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> AdaptationSet::new(content_type? : String, mime_type? : String, lang? : String) -&gt; AdaptationSet</code>
           <div class="doc"><p>A set carrying <code>content_type</code>, <code>mime_type</code> and a language.</p></div>
@@ -1577,6 +1785,10 @@ data.</em></li>
           <li><b>mut value</b><span>String?</span> <em>The value the scheme gives this entry, when it gives one.</em></li>
           <li><b>mut pssh</b><span>Bytes?</span> <em>The <code>pssh</code> box, decoded.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> ContentProtection::new(scheme_id_uri : String, value? : String, pssh? : Bytes) -&gt; ContentProtection</code>
           <div class="doc"><p>An entry for <code>scheme_id_uri</code>, optionally carrying a value and a header.</p></div>
@@ -1590,6 +1802,10 @@ data.</em></li>
           <li><b>mut source_url</b><span>String?</span></li>
           <li><b>mut range</b><span>Range?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Initialization::new(source_url? : String) -&gt; Initialization</code>
           <div class="doc"><p>An initialisation section at <code>source_url</code>, with nothing else set.</p></div>
@@ -1604,6 +1820,10 @@ data.</em></li>
           <li>Dynamic <em>A presentation that keeps growing, where the manifest is reloaded.</em></li>
           <li>Other(String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Kind::code(self : Kind) -&gt; String</code>
           <div class="doc"><p>The kind as it is written.</p></div>
@@ -1630,6 +1850,10 @@ data.</em></li>
           <li><b>mut base_url</b><span>String?</span></li>
           <li><b>mut periods</b><span>Array[Period]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Manifest::encode(self : Manifest) -&gt; String</code>
           <div class="doc"><p>Write the manifest.</p></div>
@@ -1651,6 +1875,10 @@ data.</em></li>
         <ul class="variants">
           <li>Malformed(at~ : Int32, want~ : String, got~ : String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">output</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> MpdError::to_string(Self) -&gt; String</code>
           <div class="doc"><p>The message, as the error prints it.</p></div>
@@ -1671,6 +1899,10 @@ data.</em></li>
           <li><b>mut protection</b><span>Array[ContentProtection]</span></li>
           <li><b>mut adaptations</b><span>Array[AdaptationSet]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Period::new(id? : String, start? : Double) -&gt; Period</code>
           <div class="doc"><p>A period that starts at <code>start</code> seconds.</p></div>
@@ -1685,6 +1917,10 @@ data.</em></li>
           <li><b>mut start</b><span>Int64</span></li>
           <li><b>mut end</b><span>Int64?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Range::length(self : Range) -&gt; Int64?</code>
           <div class="doc"><p>How many bytes the range covers, when its end is known.</p></div>
@@ -1721,6 +1957,10 @@ data.</em></li>
           <li><b>mut segment_base</b><span>SegmentBase?</span></li>
           <li><b>mut protection</b><span>Array[ContentProtection]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Representation::new(id : String, bandwidth? : Int32) -&gt; Representation</code>
           <div class="doc"><p>A representation of <code>id</code> costing <code>bandwidth</code> bits per second.</p></div>
@@ -1738,6 +1978,10 @@ data.</em></li>
           <li><b>mut index_range_exact</b><span>Bool?</span></li>
           <li><b>mut initialization</b><span>Initialization?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> SegmentBase::new() -&gt; SegmentBase</code>
           <div class="doc"><p>A segment base with nothing set.</p></div>
@@ -1756,6 +2000,10 @@ data.</em></li>
           <li><b>mut initialization</b><span>Initialization?</span></li>
           <li><b>mut urls</b><span>Array[SegmentUrl]</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> SegmentList::length(self : SegmentList) -&gt; Int32</code>
           <div class="doc"><p>How many segments the list holds.</p></div>
@@ -1774,6 +2022,10 @@ data.</em></li>
           <li><b>mut media_range</b><span>Range?</span></li>
           <li><b>mut index_range</b><span>Range?</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> SegmentUrl::new(media? : String) -&gt; SegmentUrl</code>
           <div class="doc"><p>A segment named <code>media</code>, with no range: the whole file.</p></div>
@@ -1792,6 +2044,10 @@ data.</em></li>
           <li><b>mut media</b><span>String?</span> <em>Where the segments are, with <code>$Number$</code> or <code>$Time$</code> in it.</em></li>
           <li><b>mut timeline</b><span>Array[Timeline]</span> <em>The segments' times and lengths, when they are not all the same.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Template::count(self : Template, seconds : Double) -&gt; Int32</code>
           <div class="doc"><p>How many segments this template addresses, when the presentation lasts <code>seconds</code>.</p>
@@ -1821,6 +2077,10 @@ data.</em></li>
           <li><b>mut duration</b><span>Int64</span></li>
           <li><b>mut repeat</b><span>Int32</span> <em>How many times the entry repeats, <code>-1</code> for "until the next entry".</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
         <div class="entry method">
           <code class="sig"><span class="kw">pub fn</span> Timeline::new(duration : Int64, repeat? : Int32, time? : Int64) -&gt; Timeline</code>
           <div class="doc"><p>A run of segments of <code>duration</code> in timescale units.</p></div>
@@ -1906,6 +2166,10 @@ data.</em></li>
           <li><b>composition_offset</b><span>Int64</span></li>
           <li><b>sync</b><span>Bool</span></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -1920,6 +2184,10 @@ a key frame, and is kept as a field because a caller assembling its own
 segments may want to know.</em></li>
           <li><b>samples</b><span>Array[Int32]</span> <em>How many samples each track contributes, in track order.</em></li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
       <div class="entry">
         <span class="kind">struct</span>
@@ -1945,6 +2213,10 @@ segments may want to know.</em></li>
           <li>Subtitle</li>
           <li>Other(String)</li>
         </ul>
+        <div class="entry method derived">
+          <code class="sig">equal, not_equal, to_repr</code>
+          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>
+        </div>
       </div>
     </section>
     </div>

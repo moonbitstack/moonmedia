@@ -35,7 +35,8 @@ PACKAGES = [
 ]
 
 # Derive writes these; they are the same four on every type and say nothing
-# about the type. `to_string` stays: a caller does call it.
+# about the type. They are still public, so the page lists them, gathered into
+# one line per type rather than four entries that read alike.
 MECHANICAL = {"equal", "not_equal", "to_repr", "output"}
 
 
@@ -283,6 +284,16 @@ def signature_html(signature):
     return escaped
 
 
+def public_names(entries):
+    """Every name the page has to list: the entries, and what hangs off them."""
+    names = []
+    for entry in entries:
+        names.append(entry.name)
+        for method in entry.methods:
+            names.append(method.split("fn ", 1)[-1].split("(")[0].strip())
+    return [name.split("::")[-1] for name in names]
+
+
 def render_package(package, title, blurb):
     base = SRC if package == "moonmedia" else SRC / package
     docs, field_docs, variant_docs, signatures = scan_source(base)
@@ -292,11 +303,16 @@ def render_package(package, title, blurb):
     functions = [e for e in entries if e.kind == "function"]
     values = [e for e in entries if e.kind == "value"]
 
-    for entry in types + functions:
-        entry.methods = [m for m in entry.methods
-                         if m.split("(")[0].split("::")[-1] not in MECHANICAL]
-    functions = [f for f in functions
-                 if f.name.split("(")[0].split("::")[-1] not in MECHANICAL]
+    derived = {}
+    for entry in types:
+        kept = []
+        for method in entry.methods:
+            leaf = method.split("(")[0].split("::")[-1]
+            if leaf in MECHANICAL:
+                derived.setdefault(entry.name, []).append(leaf)
+            else:
+                kept.append(method)
+        entry.methods = kept
 
     def sort_key(entry):
         return entry.name.lower()
@@ -338,6 +354,14 @@ def render_package(package, title, blurb):
                 signature = name + ("(" + payload + ")" if payload else "")
                 parts.append("          <li>%s%s</li>" % (html.escape(signature, quote=False), note_html))
             parts.append("        </ul>")
+
+        names = sorted(derived.get(entry.name, []))
+        if names:
+            parts.append('        <div class="entry method derived">')
+            parts.append('          <code class="sig">%s</code>' % ", ".join(names))
+            parts.append('          <div class="doc"><p>Written by <code>#derive</code> or the trait written for the type.</p></div>')
+            parts.append('        </div>')
+            count += len(names)
 
         for method in sorted(entry.methods, key=lambda m: m.split("(")[0].lower()):
             name = method.split("fn ", 1)[1].split("(")[0].strip()
@@ -381,7 +405,20 @@ def render_package(package, title, blurb):
             count += 1
 
     parts.append("    </section>")
-    return "\n".join(parts), count
+    body = "\n".join(parts)
+    # The page is the reference, so a name the interfaces publish and the page
+    # does not show is a bug here rather than something a reader has to notice.
+    signatures_shown = re.sub(
+        r"<[^>]+>", " ", " ".join(re.findall(r'<code class="sig">(.*?)</code>', body, re.S))
+    )
+    missing = [
+        name for name in public_names(entries) if name not in signatures_shown
+    ]
+    if missing:
+        raise SystemExit(
+            "%s: the reference does not list %s" % (package, ", ".join(sorted(set(missing))))
+        )
+    return body, count
 
 
 def main():

@@ -75,7 +75,7 @@ let movie : String =
 ///     moon run src/examples/03-package
 #coverage.skip
 fn main raise {
-  let bytes = @base64.decode(movie, ignore_whitespace=true)
+  let bytes = @base64.decode(movie, whitespace=true)
   let file = @mp4.Mp4::parse(bytes[:])
   let tracks = file.tracks()
   println("tracks: " + tracks.length().to_string())

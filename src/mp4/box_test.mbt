@@ -172,7 +172,7 @@ let fragmented : String =
 
 ///|
 fn bytes_of(text : String) -> Bytes {
-  @base64.decode(text, ignore_whitespace=true) catch {
+  @base64.decode(text, whitespace=true) catch {
     _ => Bytes::new(0)
   }
 }
@@ -415,4 +415,40 @@ test "panic: trailing bytes that are not a box are refused" {
     b'\x00', b'\x00', b'\x00', b'\x08', b'f', b'r', b'e', b'e', b'\x00',
   ])
   @mp4.parse(data[:]) |> ignore
+}
+
+///|
+/// The fixture with the three bytes of `avcC` replaced: the profile, the
+/// compatibility flags and the level, which are what the codec string quotes.
+fn with_avcc(
+  data : Bytes,
+  profile : Byte,
+  compatibility : Byte,
+  level : Byte,
+) -> Bytes {
+  let bytes = data.to_array()
+  let mut at = 0
+  while at + 8 < bytes.length() {
+    if bytes[at] == b'a' &&
+      bytes[at + 1] == b'v' &&
+      bytes[at + 2] == b'c' &&
+      bytes[at + 3] == b'C' {
+      bytes[at + 5] = profile
+      bytes[at + 6] = compatibility
+      bytes[at + 7] = level
+      break
+    }
+    at = at + 1
+  }
+  Bytes::from_array(bytes[:])
+}
+
+///|
+test "the codec string is the three avcC bytes, lower case and zero padded" {
+  // The middle byte is zero and the last is below ten, so a reader that trims a
+  // zero or prints an upper case letter shows here rather than in a player that
+  // cannot find the decoder.
+  let data = with_avcc(bytes_of(progressive), b'\x64', b'\x00', b'\x1F')
+  let video = @mp4.Mp4::parse(data[:]).tracks()[0]
+  assert_eq(video.codec, "avc1.64001f")
 }

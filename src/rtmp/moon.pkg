@@ -12,5 +12,5 @@ import {
 }
 
 import {
-  "moonbitlang/core/encoding/base64",
+  "moonbitstack/moonbase/base64",
 } for "test"

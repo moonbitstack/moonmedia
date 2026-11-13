@@ -76,9 +76,10 @@
     <section id="install">
       <h2>Install</h2>
 <p>One package holds the five formats and the packager. The formats are
-imported by their own paths, and the alias is the last part of the path.</p><div class="code"><span class="label">shell</span><pre>moon add moonbitstack/moonmedia</pre></div><p>The library depends on the standard library and nothing else. A program
-that reads playlists and never opens a container carries only the playlist
-code.</p>
+imported by their own paths, and the alias is the last part of the path.</p><div class="code"><span class="label">shell</span><pre>moon add moonbitstack/moonmedia</pre></div><p>Nothing is pulled in beyond the standard library, apart from the base
+encodings that turn a sample description's bytes into the hexadecimal a codec
+string quotes. A program that reads playlists and never opens a container
+carries only the playlist code.</p>
     </section>
     <section id="playlists">
       <h2>Playlists</h2>
@@ -208,7 +209,7 @@ runs as written.</p>
 <div class="code"><span class="label">moonbit</span><pre>test {
   let movie =
     #|AAAAIGZ0eXBpc29tAAACAGlzb21pc28yYXZjMW1wNDEAAAJqbW9vdgAAAGxtdmhkAAAAAAAAAAAAAAAAAAAD6AAAB9AAAQAAAQAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAgAAAfZ0cmFrAAAAXHRraGQAAAAHAAAAAAAAAAAAAAABAAAAAAAAB9AAAAAAAAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAABAAAAAAEAAAABAAAAAAAGSbWRpYQAAACBtZGhkAAAAAAAAAAAAAAAAAAAyAAAAB9BVxAAAAAAALWhkbHIAAAAAAAAAAHZpZGUAAAAAAAAAAAAAAABWaWRlb0hhbmRsZXIAAAABPW1pbmYAAAAUdm1oZAAAAAEAAAAAAAAAAAAAASFzdGJsAAAAhXN0c2QAAAAAAAAAAQAAAHVhdmMxAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAAAEAAQABIAAAASAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGP//AAAAH2F2Y0MBQsAK/+EACWdCwArZAPA8AQAEaM48gAAAABhzdHRzAAAAAAAAAAEAAAAIAAAMgAAAABxzdHNjAAAAAAAAAAEAAAABAAAACAAAAAEAAAA0c3RzegAAAAAAAAAAAAAACAAAAAUAAAAFAAAABQAAAAUAAAAFAAAABQAAAAUAAAAFAAAAGHN0c3MAAAAAAAAAAgAAAAEAAAAFAAAAFHN0Y28AAAAAAAAAAQAAApIAAAAwbWRhdAAAAAFlAAAAAUEAAAABQQAAAAFBAAAAAWUAAAABQQAAAAFBAAAAAUE=
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.5)
   let init = packager.init_segment()
   println("init " + init.length().to_string() + " bytes")

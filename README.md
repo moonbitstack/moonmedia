@@ -33,8 +33,8 @@ cut and repackaged without a socket or a file anywhere in the library.
 - **`moonmedia`** — the packager that ties them together: an MP4 in, key-frame
   segments and the playlists that name them out.
 
-Each package has one job and no dependencies outside the standard library, so a
-program that only needs HLS playlists does not carry a container parser with it.
+Each package has one job and no I/O of its own, so a program that only needs HLS
+playlists does not carry a container parser with it.
 
 | Package | Reads and writes | Specification |
 |:--|:--|:--|
@@ -75,7 +75,7 @@ let packed =
   #|ABxzdHNjAAAAAAAAAAEAAAABAAAACAAAAAEAAAA0c3RzegAAAAAAAAAAAAAACAAAAAUAAAAFAAAABQAAAAUAAAAF
   #|AAAABQAAAAUAAAAFAAAAGHN0c3MAAAAAAAAAAgAAAAEAAAAFAAAAFHN0Y28AAAAAAAAAAQAAApIAAAAwbWRhdAAA
   #|AAFlAAAAAUEAAAABQQAAAAFBAAAAAWUAAAABQQAAAAFBAAAAAUE=
-let movie = @base64.decode(packed, ignore_whitespace=true)
+let movie = @base64.decode(packed, whitespace=true)
 
 let file = @mp4.Mp4::parse(movie)
 assert_eq(file.boxes.map(fn(box) { box.type_ }), ["ftyp", "moov", "mdat"])

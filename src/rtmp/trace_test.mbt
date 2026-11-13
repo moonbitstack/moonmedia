@@ -67,7 +67,7 @@ let publish_trace : String =
 ///|
 /// Read base64, tolerating the line breaks the text has.
 fn trace_bytes() -> Bytes {
-  @base64.decode(publish_trace, ignore_whitespace=true) catch {
+  @base64.decode(publish_trace, whitespace=true) catch {
     _ => Bytes::new(0)
   }
 }

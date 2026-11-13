@@ -10,8 +10,9 @@ import {
   "moonbitlang/core/buffer",
   "moonbitlang/core/debug",
   "moonbitlang/core/encoding/utf8",
+  "moonbitstack/moonbase/base16",
 }
 
 import {
-  "moonbitlang/core/encoding/base64",
+  "moonbitstack/moonbase/base64",
 } for "test"

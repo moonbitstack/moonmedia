@@ -82,7 +82,7 @@ test {
     #|ABxzdHNjAAAAAAAAAAEAAAABAAAACAAAAAEAAAA0c3RzegAAAAAAAAAAAAAACAAAAAUAAAAFAAAABQAAAAUAAAAF
     #|AAAABQAAAAUAAAAFAAAAGHN0c3MAAAAAAAAAAgAAAAEAAAAFAAAAFHN0Y28AAAAAAAAAAQAAApIAAAAwbWRhdAAA
     #|AAFlAAAAAUEAAAABQQAAAAFBAAAAAWUAAAABQQAAAAFBAAAAAUE=
-  let movie = @base64.decode(packed, ignore_whitespace=true)
+  let movie = @base64.decode(packed, whitespace=true)
   let file = @mp4.Mp4::parse(movie[:])
   assert_eq(file.boxes.map(fn(box) { box.type_ }), ["ftyp", "moov", "mdat"])
   let video = file.tracks()[0]

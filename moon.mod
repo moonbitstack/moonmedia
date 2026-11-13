@@ -28,6 +28,10 @@ keywords = [
   "rtmp",
   "playlist",
   "container",
+  "content-protection",
+  "drm",
+  "cenc",
+  "pssh",
   "live-streaming",
   "moonbit",
 ]
@@ -35,3 +39,7 @@ keywords = [
 description = "Streaming playlists and containers for MoonBit: m3u8, MPD, MPEG-TS, fMP4 and RTMP."
 
 source = "src"
+
+import {
+  "moonbitstack/moonbase@0.5.0",
+}

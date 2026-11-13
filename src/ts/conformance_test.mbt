@@ -68,7 +68,7 @@ fn join(lines : Array[String]) -> String {
 
 ///|
 fn load(text : String) -> Bytes raise {
-  @base64.decode(text, ignore_whitespace=true)
+  @base64.decode(text, whitespace=true)
 }
 
 ///|

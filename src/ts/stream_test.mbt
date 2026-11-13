@@ -88,7 +88,7 @@ let stream : String =
 
 ///|
 fn bytes_of(text : String) -> Bytes {
-  @base64.decode(text, ignore_whitespace=true) catch {
+  @base64.decode(text, whitespace=true) catch {
     _ => Bytes::new(0)
   }
 }
@@ -275,4 +275,27 @@ test "panic: a section that claims more bytes than it has is refused" {
     b'\x00', b'\xF0', b'\xFF', b'\x00', b'\x01', b'\xC1', b'\x00', b'\x00',
   ])
   @ts.Section::parse(data[:], 0) |> ignore
+}
+
+///|
+/// What the packet at the start of `data` is refused with, or `"accepted"` when
+/// it is a packet.
+fn refusal(data : Bytes) -> String {
+  let outcome = Ok(@ts.Packet::parse(data[:])) catch { failure => Err(failure) }
+  match outcome {
+    Ok(_) => "accepted"
+    Err(failure) => failure.to_string()
+  }
+}
+
+///|
+test "a byte that is not a sync byte is named in two digits, lower case" {
+  // The message is read beside a hex dump of the stream, so the byte it found
+  // has to be two digits: a single `0x0` is a different byte from `0x00`.
+  assert_eq(
+    refusal(Bytes::new(188)),
+    "at 0: want a packet starting with 0x47, got 0x00",
+  )
+  let high = Bytes::makei(188, i => if i == 0 { b'\xAB' } else { b'\x00' })
+  assert_eq(refusal(high), "at 0: want a packet starting with 0x47, got 0xab")
 }

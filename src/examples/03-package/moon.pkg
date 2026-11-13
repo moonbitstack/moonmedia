@@ -2,7 +2,7 @@
 pkgtype(kind: "executable")
 
 import {
-  "moonbitlang/core/encoding/base64",
+  "moonbitstack/moonbase/base64",
   "moonbitstack/moonmedia",
   "moonbitstack/moonmedia/mp4",
 }

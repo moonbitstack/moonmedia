@@ -97,7 +97,7 @@ let movie : String =
 
 ///|
 test "a movie becomes an initialisation section and key frame segments" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   let segments = packager.segments()
   assert_true(segments.length() >= 1)
@@ -124,7 +124,7 @@ test "a movie becomes an initialisation section and key frame segments" {
 
 ///|
 test "the media playlist names the segments it was given" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   let playlist = packager.media_playlist()
   let text = playlist.encode()
@@ -146,7 +146,7 @@ test "the media playlist names the segments it was given" {
 
 ///|
 test "the master playlist names the codecs a player has to support" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file)
   let master = packager.master_playlist()
   assert_eq(master.variants.length(), 1)
@@ -170,7 +170,7 @@ test "panic: a file with no movie header cannot be cut" {
 
 ///|
 test "a packaged stream reads back as a fragmented file and cuts the same way" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let first = @moonmedia.Packager::new(file, target_duration=0.3)
   // What a player does: the initialisation section, then the segments in order.
   let buf = @buffer.Buffer()
@@ -198,7 +198,7 @@ test "a packaged stream reads back as a fragmented file and cuts the same way" {
 
 ///|
 test "the packaged stream lasts as long as the segments it was cut into" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   let mut total = 0.0
   for segment in packager.segments() {
@@ -210,7 +210,7 @@ test "the packaged stream lasts as long as the segments it was cut into" {
 
 ///|
 test "the media playlist can be served from a prefix" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   let playlist = packager.media_playlist(
     prefix="media/",
@@ -228,7 +228,7 @@ test "the media playlist can be served from a prefix" {
 
 ///|
 test "the master playlist keeps the bandwidth and the name it is given" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file)
   let master = packager.master_playlist(uri="index.m3u8", bandwidth=800_000)
   assert_eq(master.variants.length(), 1)
@@ -257,9 +257,7 @@ let gop_movie : String =
 
 ///|
 test "a cut never falls inside a group of pictures" {
-  let file = @mp4.Mp4::parse(
-    @base64.decode(gop_movie, ignore_whitespace=true)[:],
-  )
+  let file = @mp4.Mp4::parse(@base64.decode(gop_movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   // The nearest key frame is one second away, so each segment lasts a second
   // even though the target is 0.3.
@@ -273,7 +271,7 @@ test "a cut never falls inside a group of pictures" {
 
 ///|
 test "the media playlist is a complete one of independent segments" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   let text = packager.media_playlist().encode()
   // A file that has an end is a VOD playlist, and every segment begins on a key
@@ -286,7 +284,7 @@ test "the media playlist is a complete one of independent segments" {
 
 ///|
 test "the initialisation section describes the codec and claims no frames" {
-  let file = @mp4.Mp4::parse(@base64.decode(movie, ignore_whitespace=true)[:])
+  let file = @mp4.Mp4::parse(@base64.decode(movie, whitespace=true)[:])
   let packager = @moonmedia.Packager::new(file, target_duration=0.3)
   let init = @mp4.Mp4::parse(packager.init_segment())
   let moov = init.movie().unwrap()

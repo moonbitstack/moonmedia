@@ -13,7 +13,7 @@ fn main raise {
   // The JSON the script reads back; `@json` keeps the base64 and the playlist
   // text escaped without a writer here having to think about it.
 
-  let movie = @base64.decode(clip, ignore_whitespace=true)
+  let movie = @base64.decode(clip, whitespace=true)
   let file = @mp4.Mp4::parse(movie[:])
   // The clip holds a key frame every half second, and the target is shorter
   // than that: a segment may only begin where a player may begin, so each one

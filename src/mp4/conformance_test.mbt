@@ -78,7 +78,7 @@ fn describe(file : @mp4.Mp4) -> String raise @mp4.Mp4Error {
 
 ///|
 fn load(text : String) -> Bytes raise {
-  @base64.decode(text, ignore_whitespace=true)
+  @base64.decode(text, whitespace=true)
 }
 
 ///|

@@ -244,7 +244,7 @@ pub fn Packet::parse_at(
     raise Malformed(
       at=origin + at,
       want="a packet starting with 0x47",
-      got=hex_byte(data.at(at)),
+      got="0x" + @base16.encode(data[at:at + 1]),
     )
   }
   let b1 = data.at(at + 1).to_int() & 0xFF
@@ -372,16 +372,6 @@ pub fn Packet::encode(self : Packet) -> Bytes {
     padded.write_byte(b'\xFF')
   }
   padded.contents()
-}
-
-///|
-/// Two hex digits.
-fn hex_byte(value : Byte) -> String {
-  let digits = "0123456789abcdef"
-  let byte = value.to_int() & 0xFF
-  "0x" +
-  digits[byte >> 4:(byte >> 4) + 1].to_owned() +
-  digits[byte & 0xF:(byte & 0xF) + 1].to_owned()
 }
 
 ///|

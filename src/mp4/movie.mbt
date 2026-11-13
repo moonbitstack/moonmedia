@@ -482,11 +482,7 @@ fn sample_description(
       Some(avcc) => {
         let config = avcc.raw()[:]
         if config.length() >= 4 {
-          format +
-          "." +
-          byte_hex(config.at(1)) +
-          byte_hex(config.at(2)) +
-          byte_hex(config.at(3))
+          format + "." + @base16.encode(config[1:4])
         } else {
           format
         }
@@ -499,15 +495,6 @@ fn sample_description(
     format
   }
   (codec, width, height, sample_rate, channels)
-}
-
-///|
-/// Two hex digits of a byte, lower case.
-fn byte_hex(value : Byte) -> String {
-  let digits = "0123456789abcdef"
-  let byte = value.to_int() & 0xFF
-  digits[byte >> 4:(byte >> 4) + 1].to_owned() +
-  digits[byte & 0xF:(byte & 0xF) + 1].to_owned()
 }
 
 ///|

@@ -464,6 +464,10 @@ or decode anything.</p>
   maintains, dropping the segment that fell out and adding the one that just
   finished — the playlist type writes it, and the low-latency tags are read
   and written the same way.</li>
+  <li><b>A manifest is read into a model, not kept as text.</b> What the model
+  has no name for — an event stream, a clock hint, a role — is not written back
+  when the manifest is encoded again. Protection is named, because a player
+  cannot open a rendition without it.</li>
 </ul>
 <p>Next: the reference lists every function and type, and the
 <a href="anatomy.html">anatomy</a> takes one second of video apart three

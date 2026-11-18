@@ -68,7 +68,7 @@ pub fn Box::children(type_ : StringView, boxes : Array[Box]) -> Box {
     type_: type_.to_owned(),
     usertype: None,
     large: false,
-    content: Children(prefix=Bytes::new(0), boxes~),
+    content: Children(prefix=b"", boxes~),
   }
 }
 

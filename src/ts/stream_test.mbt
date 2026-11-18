@@ -89,7 +89,7 @@ let stream : String =
 ///|
 fn bytes_of(text : String) -> Bytes {
   @base64.decode(text, whitespace=true) catch {
-    _ => Bytes::new(0)
+    _ => b""
   }
 }
 
@@ -244,20 +244,20 @@ test "a packet written here reads back as the packet that went in" {
   // flags, one of header length, ten of timestamps, and the data itself.
   assert_eq(pes.encode().length(), 3 + 1 + 2 + 2 + 1 + 10 + 5)
   // A packet with no timestamp says so rather than guessing.
-  let plain = @ts.Pes::new(0xE0, Bytes::new(4))
+  let plain = @ts.Pes::new(0xE0, Bytes::make(4, b'\x00'))
   assert_eq(plain.pts(), None)
   assert_eq(@ts.Pes::parse(plain.encode()[:]).data.length(), 4)
 }
 
 ///|
 test "panic: a packet that does not start with the sync byte is refused" {
-  let data = Bytes::new(188)
+  let data = Bytes::make(188, b'\x00')
   @ts.parse(data[:]) |> ignore
 }
 
 ///|
 test "panic: a stream that is not a whole number of packets is refused" {
-  let data = Bytes::new(200)
+  let data = Bytes::make(200, b'\x00')
   @ts.parse(data[:]) |> ignore
 }
 
@@ -293,7 +293,7 @@ test "a byte that is not a sync byte is named in two digits, lower case" {
   // The message is read beside a hex dump of the stream, so the byte it found
   // has to be two digits: a single `0x0` is a different byte from `0x00`.
   assert_eq(
-    refusal(Bytes::new(188)),
+    refusal(Bytes::make(188, b'\x00')),
     "at 0: want a packet starting with 0x47, got 0x00",
   )
   let high = Bytes::makei(188, i => if i == 0 { b'\xAB' } else { b'\x00' })

@@ -78,7 +78,7 @@ pub fn Pes::parse(data : BytesView, at? : Int32) -> Pes raise TsError {
       packet_length,
       flags: 0,
       timestamp_flags: 0,
-      header: Bytes::new(0),
+      header: b"",
       data: data[cursor:min(end, data.length())].to_owned(),
     }
   }

@@ -256,7 +256,7 @@ pub fn Section::new(
     current: true,
     number: number.unwrap_or(0),
     last_number: last_number.unwrap_or(0),
-    body: body.unwrap_or(Bytes::new(0)),
+    body: body.unwrap_or(b""),
   }
 }
 
@@ -284,7 +284,7 @@ pub fn Stream::new(
   pid : Int32,
   descriptors? : Bytes,
 ) -> Stream {
-  { stream_type, pid, descriptors: descriptors.unwrap_or(Bytes::new(0)), }
+  { stream_type, pid, descriptors: descriptors.unwrap_or(b""), }
 }
 
 ///|
@@ -375,7 +375,7 @@ pub fn Pmt::new(
     program: program.unwrap_or(1),
     pcr_pid: pcr_pid.unwrap_or(0x100),
     version: version.unwrap_or(0),
-    descriptors: descriptors.unwrap_or(Bytes::new(0)),
+    descriptors: descriptors.unwrap_or(b""),
     streams: streams.unwrap_or([]),
   }
 }

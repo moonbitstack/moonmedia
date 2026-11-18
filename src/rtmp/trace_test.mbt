@@ -68,7 +68,7 @@ let publish_trace : String =
 /// Read base64, tolerating the line breaks the text has.
 fn trace_bytes() -> Bytes {
   @base64.decode(publish_trace, whitespace=true) catch {
-    _ => Bytes::new(0)
+    _ => b""
   }
 }
 
@@ -133,6 +133,6 @@ test "a message that arrives before the stream is set up is still read" {
   assert_eq(session.stream_name(), "test")
   // Reading the same bytes twice does not duplicate anything.
   let before = session.metadata().length()
-  let _ = session.push(Bytes::new(0))
+  let _ = session.push(b"")
   assert_eq(session.metadata().length(), before)
 }

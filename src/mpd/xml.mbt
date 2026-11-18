@@ -427,7 +427,7 @@ fn decode_text(bytes : Bytes) -> String {
 /// The character a numeric reference names, when it names one a document may
 /// carry.
 fn numeric_entity(digits : StringView, base : Int32) -> String? {
-  let value = @string.parse_int(digits, base~) catch { _ => return None }
+  let value = @string.parse_int(digits, radix=base) catch { _ => return None }
   match value.to_char() {
     Some(ch) => Some(ch.to_string())
     None => None

@@ -173,7 +173,7 @@ let fragmented : String =
 ///|
 fn bytes_of(text : String) -> Bytes {
   @base64.decode(text, whitespace=true) catch {
-    _ => Bytes::new(0)
+    _ => b""
   }
 }
 

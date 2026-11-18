@@ -283,7 +283,7 @@ pub fn Packet::parse_at(
   let payload = if (control & 0x1) != 0 && cursor <= at + packet_size {
     data[cursor:at + packet_size].to_owned()
   } else {
-    Bytes::new(0)
+    b""
   }
   {
     error,

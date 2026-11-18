@@ -20,8 +20,8 @@ pub fn client_start(time : Int32, random? : Bytes) -> Bytes {
   let buf = @buffer.Buffer()
   buf.write_byte(version.to_byte())
   write_u32(buf, time)
-  buf.write_bytes(Bytes::new(4))
-  buf.write_bytes(random.unwrap_or(Bytes::new(random_size)))
+  buf.write_bytes(Bytes::make(4, b'\x00'))
+  buf.write_bytes(random.unwrap_or(Bytes::make(random_size, b'\x00')))
   buf.contents()
 }
 
@@ -42,9 +42,9 @@ pub struct Handshake {
 /// A handshake with a block of `random` bytes, zeros when none are given.
 pub fn Handshake::new(random? : Bytes) -> Handshake {
   {
-    random: random.unwrap_or(Bytes::new(random_size)),
-    s1: Bytes::new(0),
-    c1: Bytes::new(0),
+    random: random.unwrap_or(Bytes::make(random_size, b'\x00')),
+    s1: b"",
+    c1: b"",
     complete: false,
   }
 }
@@ -73,7 +73,7 @@ pub fn Handshake::answer(
   buf.write_byte(version.to_byte())
   let s1 = @buffer.Buffer()
   write_u32(s1, time.unwrap_or(0))
-  s1.write_bytes(Bytes::new(4))
+  s1.write_bytes(Bytes::make(4, b'\x00'))
   s1.write_bytes(self.random)
   let s1_bytes = s1.contents()
   buf.write_bytes(s1_bytes)

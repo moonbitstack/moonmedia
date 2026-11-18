@@ -112,7 +112,7 @@ test "panic: a client that echoes the wrong block is refused" {
     random=Bytes::makei(1528, i => (i & 0xFF).to_byte()),
   )
   let _ = server.answer(client[:])
-  server.complete_with(Bytes::new(1536))
+  server.complete_with(Bytes::make(1536, b'\x00'))
 }
 
 ///|

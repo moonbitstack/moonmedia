@@ -1,6 +1,6 @@
 name = "moonbitstack/moonmedia"
 
-version = "0.2.0"
+version = "0.2.1"
 
 readme = "README.md"
 
@@ -41,5 +41,5 @@ description = "Streaming playlists and containers for MoonBit: m3u8, MPD, MPEG-T
 source = "src"
 
 import {
-  "moonbitstack/moonbase@0.5.0",
+  "moonbitstack/moonbase@0.5.1",
 }
